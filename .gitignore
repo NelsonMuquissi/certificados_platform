@@ -1,0 +1,33 @@
+# Arquivos e pastas específicas do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.python-version
+venv/
+env/
+.env
+
+# Arquivos específicos do Django
+db.sqlite3
+*.log
+*.pot
+*.pyc
+.coverage
+nosetests.xml
+coverage.xml
+*.mo
+*.swp
+
+# Diretórios de dependências
+node_modules/
+.vscode/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Diretório de arquivos estáticos coletados
+/staticfiles/
+/media/
+
