@@ -8,7 +8,6 @@ aiosqlite==0.17.0
 aniso8601==9.0.1
 antlr4-python3-runtime==4.9.1
 anyio==3.6.2
-apparmor==3.0.8
 appdirs==1.4.4
 applicationinsights==0.11.10
 argcomplete==2.0.0
@@ -19,12 +18,11 @@ async-generator==1.10
 async-timeout==4.0.2
 attrs==22.2.0
 avro==1.11.1
-awscli==2.9.19
-awscrt==1.0.0.dev0
+awscrt
 azure-agrifood-farming==1.0.0b2
-azure-ai-anomalydetector==3.0.0b7
+azure-ai-anomalydetector==3.0.0b6
 azure-ai-formrecognizer==3.2.1
-azure-ai-language-conversations==1.1.0b4
+azure-ai-language-conversations==1.1.0
 azure-ai-language-questionanswering==1.1.1
 azure-ai-metricsadvisor==1.1.0
 azure-ai-ml==1.4.0
