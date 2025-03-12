@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(default='sqlite:///db.sqlite3')
+}
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +31,8 @@ SECRET_KEY = 'django-insecure-dtua@0mme+%=selhk)_5hnom@7_kd$6^e_f#029#2dreq&7ufa
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['certificados_platform.onrender.com']
 
 
 # Application definition
@@ -44,6 +50,15 @@ INSTALLED_APPS = [
     'crispy_forms',
     'allauth',
     'allauth.account',
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+# Whitenoise para servir arquivos estáticos
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Adicione essa linha
+    ...
 ]
 
 MIDDLEWARE = [
