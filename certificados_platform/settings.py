@@ -31,8 +31,7 @@ SECRET_KEY = 'django-insecure-dtua@0mme+%=selhk)_5hnom@7_kd$6^e_f#029#2dreq&7ufa
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['certificados_platform.onrender.com']
+ALLOWED_HOSTS = [*]
 
 
 # Application definition
@@ -51,18 +50,11 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
 
-# Whitenoise para servir arquivos estáticos
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Adicione essa linha
-    ...
-]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
