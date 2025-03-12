@@ -59,7 +59,7 @@ class Certificado(models.Model):
     aluno = models.ForeignKey("Usuario", on_delete=models.CASCADE, limit_choices_to={'tipo': 'Aluno'})
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     data_emissao = models.DateTimeField(auto_now_add=True)
-    codigo_validacao = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    codigo_validacao = models.UUIDField(default=uuid.uuid4, unique=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Ativo')
 
     def __str__(self):

@@ -8,7 +8,7 @@ from django.http import FileResponse
 def gerar_pdf_view(request, codigo):
     certificado = get_object_or_404(Certificado, codigo_validacao=codigo)
     return certificado.gerar_pdf()
-    
+
 def validar_certificado(request, codigo):
     certificado = get_object_or_404(Certificado, codigo_validacao=codigo)
 
@@ -39,5 +39,3 @@ def get_client_ip(request):
 def home(request):
     return render(request, 'index.html')
 
-def validar_certificado(request):
-    return render(request, 'certificados/validacao.html')
