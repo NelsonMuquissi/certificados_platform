@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validação de Certificado</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        .container { border: 1px solid #ccc; padding: 20px; width: 60%; margin: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Certificado Válido ✅</h1>
+        <p><strong>Aluno:</strong> {{ certificado.aluno.nome }} {{ certificado.aluno.sobrenome }}</p>
+        <p><strong>Curso:</strong> {{ certificado.curso.nome }}</p>
+        <p><strong>Data de Emissão:</strong> {{ certificado.data_emissao }}</p>
+        <p><strong>Código de Validação:</strong> {{ certificado.codigo_validacao }}</p>
+        <p><strong>Status:</strong> {{ certificado.status }}</p>
+
+        <a href="{{ certificado.qrcode.imagem.url }}" target="_blank">
+            <img src="{{ certificado.qrcode.imagem.url }}" alt="QR Code" width="150">
+        </a>
+
+        <br><br>
+        <a href="{% url 'gerar_pdf' certificado.codigo_validacao %}" download>Baixar PDF</a>
+    </div>
+</body>
+</html>

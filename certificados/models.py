@@ -104,11 +104,12 @@ class QRCode(models.Model):
 
     def gerar_qr_code(self):
         """Gera um QR Code com link para verificação do certificado."""
-        url_validacao = f"https://certificados-platform.onrender.com/"
+        url_validacao = f"https://certificados-platform.onrender.com/validar/{self.certificado.codigo_validacao}/"
         qr = qrcode.make(url_validacao)
         buffer = BytesIO()
         qr.save(buffer, format="PNG")
         self.imagem.save(f"qr_{self.certificado.codigo_validacao}.png", ContentFile(buffer.getvalue()), save=False)
+
 
     def __str__(self):
         return f"QR Code para {self.certificado}"
