@@ -3,6 +3,9 @@ import uuid
 import qrcode
 from io import BytesIO
 from django.core.files.base import ContentFile
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
 
 # ==============================
 # MODELO DE USUÁRIO
@@ -53,30 +56,63 @@ class Certificado(models.Model):
         ('Revogado', 'Revogado'),
     ]
 
-    aluno = models.ForeignKey(Usuario, on_delete=models.CASCADE, limit_choices_to={'tipo': 'Aluno'})
+    aluno = models.ForeignKey("Usuario", on_delete=models.CASCADE, limit_choices_to={'tipo': 'Aluno'})
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     data_emissao = models.DateTimeField(auto_now_add=True)
-    codigo_validacao = models.CharField(max_length=64, unique=True)
-    qr_code = models.ImageField(upload_to='qr_codes/', blank=True)
+    codigo_validacao = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Ativo')
 
+    def __str__(self):
+        return f"Certificado de {self.aluno.nome} - {self.curso.nome}"
+
+    def gerar_pdf(self):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="certificado_{self.codigo_validacao}.pdf"'
+        
+        p = canvas.Canvas(response, pagesize=letter)
+        p.setFont("Helvetica-Bold", 20)
+        p.drawString(200, 750, "Certificado de Conclusão")
+        
+        p.setFont("Helvetica", 14)
+        p.drawString(100, 700, f"Certificamos que {self.aluno.nome} {self.aluno.sobrenome}")
+        p.drawString(100, 680, f"concluiu com êxito o curso: {self.curso.nome}")
+        p.drawString(100, 660, f"Data de emissão: {self.data_emissao.strftime('%d/%m/%Y')}")
+
+        if hasattr(self, 'qrcode') and self.qrcode.imagem:
+            from PIL import Image
+            qr = Image.open(self.qrcode.imagem.path)
+            qr = qr.resize((100, 100))
+            qr_buffer = BytesIO()
+            qr.save(qr_buffer, format="PNG")
+            p.drawInlineImage(qr_buffer, 450, 600, 100, 100)
+        
+        p.showPage()
+        p.save()
+        return response
+
+# ==============================
+# MODELO DE QR CODE
+# ==============================
+class QRCode(models.Model):
+    certificado = models.OneToOneField(Certificado, on_delete=models.CASCADE, related_name='qrcode')
+    imagem = models.ImageField(upload_to='qr_codes/', blank=True)
+
     def save(self, *args, **kwargs):
-        if not self.codigo_validacao:
-            self.codigo_validacao = uuid.uuid4().hex  # Gera código único
-        if not self.qr_code:
-            self.gerar_qr_code()  # Gera QR Code apenas se não existir
+        if not self.imagem:
+            self.gerar_qr_code()
         super().save(*args, **kwargs)
 
     def gerar_qr_code(self):
         """Gera um QR Code com link para verificação do certificado."""
-        url_validacao = f"https://ipiz.com/validar/{self.codigo_validacao}"
+        url_validacao = f"https://certificados-platform.onrender.com/"
         qr = qrcode.make(url_validacao)
         buffer = BytesIO()
         qr.save(buffer, format="PNG")
-        self.qr_code.save(f"qr_{self.codigo_validacao}.png", ContentFile(buffer.getvalue()), save=False)
+        self.imagem.save(f"qr_{self.certificado.codigo_validacao}.png", ContentFile(buffer.getvalue()), save=False)
 
     def __str__(self):
-        return f"Certificado de {self.aluno.nome} - {self.curso.nome}"
+        return f"QR Code para {self.certificado}"
+
 
 # ==============================
 # MODELO DE LOGS DE VALIDAÇÃO
@@ -84,7 +120,7 @@ class Certificado(models.Model):
 class LogValidacao(models.Model):
     certificado = models.ForeignKey(Certificado, on_delete=models.CASCADE, related_name='validacoes')
     ip_address = models.GenericIPAddressField()
-    user_agent = models.TextField(blank=True)  # Registra o navegador do usuário
+    user_agent = models.TextField(blank=True)
     data_validacao = models.DateTimeField(auto_now_add=True)
     sucesso = models.BooleanField(default=True)
 
