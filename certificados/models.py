@@ -42,6 +42,24 @@ class Usuario(AbstractUser):
     objects = UsuarioManager()
     papel = models.CharField(max_length=10, choices=PAPEIS)
     telefone = models.CharField(max_length=20, blank=True, null=True)
+    
+    # Adicione estes campos para resolver os conflitos
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_name="usuario_groups",  # Nome único para o relacionamento reverso
+        related_query_name="usuario",
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name="usuario_permissions",  # Nome único para o relacionamento reverso
+        related_query_name="usuario",
+    )
 
     def has_module_perms(self, app_label):
         return self.is_staff or self.papel in ['ADMIN', 'SECRETARIA', 'DIRECAO']
