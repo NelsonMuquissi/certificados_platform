@@ -13,8 +13,6 @@ set -o errexit
 echo "Verificando e instalando gunicorn..."
 pip show gunicorn || pip install gunicorn
 
-echo "Aplicando migrações do banco de dados..."
-python manage.py migrate
 
 echo "Coletando arquivos estáticos..."
 python manage.py collectstatic --noinput
