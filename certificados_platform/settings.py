@@ -145,7 +145,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-
+AUTH_USER_MODEL = 'certificados.Usuario'
 BASE_URL = 'https://certificados-platform.onrender.com'
 # Diretório onde os arquivos estáticos serão armazenados
 STATIC_URL = '/static/'  # URL base para os arquivos estáticos
