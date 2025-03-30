@@ -3,7 +3,11 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('validar/<uuid:codigo>/', views.validar_certificado, name='validar_certificado'),
-    path('certificado/<uuid:codigo>/pdf/', views.gerar_pdf_view, name='gerar_pdf'),
-
+    #path('', views.painel_controle, name='painel_controle'),
+    path('login/', views.login, name='login'),
+    path('verificar_certificado/', views.login, name='verificar_certificado'),
+    path('certificados/<int:certificado_id>/', views.visualizar_certificado, name='visualizar_certificado'),
+    path('certificados/<int:certificado_id>/descarregar/', views.descarregar_certificado, name='descarregar_certificado'),
+    path('verificar/<uuid:codigo_verificacao>/', views.verificar_certificado, name='verificar_certificado'),
+    # Outras URLs...
 ]

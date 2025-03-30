@@ -1,535 +1,1157 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autenticação de Certificados</title>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Sistema de Certificados Digitais - IPIZ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
+    <link rel="shortcut icon" href="{% static 'img/ipiz.png' %}" type="image/x-icon">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+        :root {
+            --primary-color: #0d47a1;
+            --primary-dark: #09316e;
+            --secondary-color: #2196f3;
+            --accent-color: #ff9800;
+            --accent-dark: #e68a00;
+            --light-blue: #e3f2fd;
+            --dark-blue: #0b2e5a;
+            --text-dark: #2d3748;
+            --text-light: #718096;
         }
 
+        /* Base Styles */
         body {
-            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
-            color: white;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-dark);
+            background-color: #f8fafc;
             overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        /* HEADER MODERNO */
-        header {
-            width: 100%;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            padding: 120px 20px 150px;
-            text-align: center;
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        /* Navbar with Glass Morphism */
+        .navbar {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.92) !important;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 1rem 0;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98) !important;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-dark);
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(13, 71, 161, 0.08);
+        }
+
+        /* Hero Section with Animated Gradient */
+        .hero-section {
             position: relative;
             overflow: hidden;
+            padding: 8rem 0 6rem;
+            background: linear-gradient(-45deg, #0d47a1, #1976d2, #2196f3, #0d47a1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
         }
 
-        header::before {
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero-section::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('https://via.placeholder.com/1920x800') no-repeat center center/cover;
+            background: url('{% static "img/pattern.png" %}') center/cover;
             opacity: 0.1;
-            z-index: 1;
+            pointer-events: none;
         }
 
-        header .content {
+        .hero-content {
             position: relative;
             z-index: 2;
         }
 
-        header h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-            animation: fadeIn 1s ease-in-out;
+        .hero-logo {
+            height: 100px;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+            transition: transform 0.5s ease;
         }
 
-        header p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            color: rgba(255, 255, 255, 0.9);
-            animation: fadeIn 1.5s ease-in-out;
+        .hero-logo:hover {
+            transform: translateY(-5px);
         }
 
-        header .btn {
-            padding: 15px 40px;
-            font-size: 1rem;
-            background: #ff9800;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 50px;
-            transition: transform 0.3s ease, background 0.3s;
-            animation: fadeIn 2s ease-in-out;
-            box-shadow: 0px 4px 15px rgba(255, 152, 0, 0.3);
+        .hero-illustration {
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
         }
 
-        header .btn:hover {
-            background: #e68900;
-            transform: scale(1.05);
-            box-shadow: 0px 6px 20px rgba(255, 152, 0, 0.4);
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
 
-        /* MENU DE NAVEGAÇÃO */
-        nav {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 30px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
+        /* News Slider */
+        .news-slider {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff9800;
+        .swiper-pagination-bullet {
+            background: white !important;
+            opacity: 0.5 !important;
         }
 
-        .menu {
-            list-style: none;
+        .swiper-pagination-bullet-active {
+            background: var(--accent-color) !important;
+            opacity: 1 !important;
+        }
+
+        .slide-content {
+            min-height: 300px;
             display: flex;
             align-items: center;
-        }
-
-        .menu li {
-            margin: 0 15px;
-        }
-
-        .menu a {
-            text-decoration: none;
+            padding: 3rem;
             color: white;
-            font-size: 1rem;
-            transition: 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .slide-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: -1;
+        }
+
+        /* Feature Cards with Hover Effects */
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            height: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+
+        /* Verification Section with Glass Effect */
+        .verification-box {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--accent-color);
+            transition: all 0.4s ease;
+        }
+
+        .verification-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+        }
+
+        /* Stats Cards with Counter Animation */
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Sector Cards with Overlay */
+        .sector-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0, 1);
             position: relative;
         }
 
-        .menu a::after {
-            content: '';
+        .sector-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .sector-card img {
+            transition: transform 0.5s ease;
+            height: 240px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .sector-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .sector-overlay {
             position: absolute;
-            width: 0;
-            height: 2px;
-            background: #ff9800;
-            bottom: -5px;
+            bottom: 0;
             left: 0;
-            transition: 0.3s;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 1.5rem;
+            color: white;
         }
 
-        .menu a:hover::after {
-            width: 100%;
-        }
-
-        /* CONTAINER PRINCIPAL */
-        main {
-            max-width: 1200px;
-            padding: 40px;
-            margin-top: 80px;
-            text-align: center;
-        }
-
-        /* SEÇÃO DE INFORMAÇÕES */
-        .info-section {
-            margin-top: 80px;
-            text-align: center;
-            max-width: 1200px;
-            padding: 20px;
-        }
-
-        .info-section h2 {
-            font-size: 2.5rem;
-            margin-bottom: 40px;
-            font-weight: 600;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .info-boxes {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        .info-box {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 15px;
-            width: 280px;
-            text-align: center;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s;
-            animation: fadeInUp 1s ease-in-out;
-        }
-
-        .info-box:hover {
-            transform: translateY(-10px);
-            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .info-box i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #ff9800;
-        }
-
-        .info-box h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .info-box p {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* SEÇÃO "COMO FUNCIONA" */
-        .how-it-works {
-            margin-top: 80px;
-            text-align: center;
-            max-width: 1200px;
-            padding: 20px;
-        }
-
-        .how-it-works h2 {
-            font-size: 2.5rem;
-            margin-bottom: 40px;
-            font-weight: 600;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .steps {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        .step {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 15px;
-            width: 280px;
-            text-align: center;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s;
-            animation: fadeInUp 1s ease-in-out;
-        }
-
-        .step:hover {
-            transform: translateY(-10px);
-            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .step i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #ff9800;
-        }
-
-        .step h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .step p {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* SEÇÃO DE DEPOIMENTOS */
-        .testimonials {
-            margin-top: 80px;
-            text-align: center;
-            max-width: 1200px;
-            padding: 20px;
-        }
-
-        .testimonials h2 {
-            font-size: 2.5rem;
-            margin-bottom: 40px;
-            font-weight: 600;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .testimonial-cards {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
+        /* Testimonials with Swiper */
         .testimonial-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 15px;
-            width: 280px;
-            text-align: center;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s;
-            animation: fadeInUp 1s ease-in-out;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin: 1rem;
+            position: relative;
         }
 
-        .testimonial-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: 1rem;
+            left: 1.5rem;
+            font-size: 5rem;
+            color: rgba(13, 71, 161, 0.1);
+            font-family: serif;
+            line-height: 1;
         }
 
-        .testimonial-card img {
-            width: 80px;
-            height: 80px;
+        .testimonial-img {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            margin-bottom: 15px;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .testimonial-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            font-weight: 500;
+        /* Buttons with Glow Effect */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .testimonial-card p {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 71, 161, 0.3);
         }
 
-        /* SEÇÃO DE PERGUNTAS FREQUENTES */
-        .faq {
-            margin-top: 80px;
-            text-align: center;
-            max-width: 1200px;
-            padding: 20px;
+        .btn-accent {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .faq h2 {
-            font-size: 2.5rem;
-            margin-bottom: 40px;
-            font-weight: 600;
-            animation: fadeIn 1s ease-in-out;
+        .btn-accent:hover {
+            background-color: var(--accent-dark);
+            border-color: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
         }
 
-        .faq-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            text-align: left;
-            transition: transform 0.3s ease, box-shadow 0.3s;
-            animation: fadeInUp 1s ease-in-out;
-        }
-
-        .faq-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .faq-item h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .faq-item p {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* RODAPÉ */
-        footer {
-            margin-top: 80px;
-            background: rgba(0, 0, 0, 0.5);
+        /* Floating Shapes Animation */
+        .floating-shapes {
+            position: absolute;
             width: 100%;
-            padding: 20px 0;
-            text-align: center;
-            font-size: 0.9rem;
-            backdrop-filter: blur(10px);
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
         }
 
-        /* ANIMAÇÕES */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: float 15s infinite linear;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary-color);
+            top: 10%;
+            left: 5%;
+            animation-duration: 20s;
         }
 
-        /* RESPONSIVIDADE */
-        @media (max-width: 768px) {
-            nav {
-                flex-direction: column;
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            background: var(--accent-color);
+            top: 60%;
+            left: 80%;
+            animation-duration: 25s;
+            animation-delay: 5s;
+        }
+
+        .shape-3 {
+            width: 150px;
+            height: 150px;
+            background: var(--secondary-color);
+            top: 30%;
+            left: 70%;
+            animation-duration: 15s;
+            animation-delay: 2s;
+        }
+
+        /* Wave Divider */
+        .wave-divider {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            transform: rotate(180deg);
+        }
+
+        .wave-divider svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 100px;
+        }
+
+        .wave-divider .shape-fill {
+            fill: #FFFFFF;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .hero-section {
+                padding: 6rem 0 4rem;
                 text-align: center;
             }
-            .menu {
-                margin-top: 10px;
-                flex-direction: column;
+            
+            .hero-logo {
+                height: 80px;
+                margin: 0 auto 1.5rem;
             }
-            .menu li {
-                margin: 5px 0;
+            
+            .hero-illustration {
+                margin-top: 2rem;
+                max-width: 80%;
             }
-            .info-boxes, .steps, .testimonial-cards {
-                flex-direction: column;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 5rem 0 3rem;
             }
-            h1 {
-                font-size: 2.5rem;
-            }
-            .info-section h2, .how-it-works h2, .testimonials h2, .faq h2 {
-                font-size: 2rem;
+            
+            .feature-card, .stats-card, .verification-box {
+                margin-bottom: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-
-    <!-- HEADER MODERNO -->
-    <header>
-        <div class="content">
-            <h1>Autenticação de Certificados</h1>
-            <p>Valide a autenticidade do seu certificado de forma rápida, segura e confiável.</p>
-            <button class="btn" onclick="validarCertificado()">Validar Certificado</button>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'img/ipiz.png' %}" alt="IPIZ" height="40">
+                <span class="ms-2 fw-bold d-none d-lg-inline">Certificados Digitais</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Funcionalidades</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#sectors">Cursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#verification">Verificação</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#testimonials">Depoimentos</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a href="{% url 'login' %}" class="btn btn-primary px-3 px-lg-4">
+                            <i class="fas fa-sign-in-alt me-2"></i>Acessar
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </header>
-
-    <!-- MENU DE NAVEGAÇÃO -->
-    <nav>
-        <div class="logo">CertiAuth</div>
-        <ul class="menu">
-            <li><a href="#">Início</a></li>
-            <li><a href="#">Validar Certificado</a></li>
-            <li><a href="#">Sobre</a></li>
-            <li><a href="#">Contato</a></li>
-        </ul>
     </nav>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main>
-        <!-- SEÇÃO DE INFORMAÇÕES -->
-        <div class="info-section">
-            <h2>Por que validar seu certificado?</h2>
-            <div class="info-boxes">
-                <div class="info-box">
-                    <i class="fas fa-lock"></i>
-                    <h3>Segurança</h3>
-                    <p>Evite fraudes e confirme a autenticidade do seu certificado.</p>
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <img src="{% static 'img/ipiz.png' %}" alt="IPIZ" class="hero-logo animate__animated animate__fadeIn">
+                    <h1 class="display-4 fw-bold mb-4 animate__animated animate__fadeInUp">
+                        Certificados Digitais <span class="text-warning">Verificáveis</span>
+                    </h1>
+                    <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                        Tecnologia blockchain para emissão, gestão e verificação de certificados acadêmicos e profissionais com segurança máxima.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 animate__animated animate__fadeInUp animate__delay-2s">
+                        <a href="#verification" class="btn btn-light btn-lg px-4">
+                            <i class="fas fa-search me-2"></i>Verificar Certificado
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-accent btn-lg px-4">
+                            <i class="fas fa-user-graduate me-2"></i>Área do Aluno
+                        </a>
+                    </div>
                 </div>
-                <div class="info-box">
-                    <i class="fas fa-qrcode"></i>
-                    <h3>Facilidade</h3>
-                    <p>Use QR Code ou código único para validar rapidamente.</p>
-                </div>
-                <div class="info-box">
-                    <i class="fas fa-globe"></i>
-                    <h3>Acesso Global</h3>
-                    <p>Valide seu certificado de qualquer lugar do mundo.</p>
+                <div class="col-lg-6 d-none d-lg-block animate__animated animate__fadeInRight">
+                    <img src="{% static 'img/ipi.png' %}" alt="Certificado Digital" class="img-fluid hero-illustration">
                 </div>
             </div>
         </div>
+        <div class="wave-divider">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+            </svg>
+        </div>
+    </section>
 
-        <!-- SEÇÃO "COMO FUNCIONA" -->
-        <div class="how-it-works">
-            <h2>Como Funciona</h2>
-            <div class="steps">
-                <div class="step">
-                    <i class="fas fa-search"></i>
-                    <h3>Passo 1: Insira o Código</h3>
-                    <p>Digite o código único do certificado no campo de validação.</p>
+    <!-- News Slider -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="news-slider swiper">
+                <div class="swiper-wrapper">
+                    <!-- Slide 1 -->
+                    <div class="swiper-slide">
+                        <div class="slide-content" style="background: url('{% static 'img/slide1.jpg' %}') center/cover;">
+                            <div>
+                                <h2 class="fw-bold mb-3">Novo Sistema de Certificação</h2>
+                                <p class="lead mb-4">IPIZ lança plataforma digital para emissão de certificados com tecnologia blockchain</p>
+                                <a href="#" class="btn btn-accent">Saiba Mais</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="swiper-slide">
+                        <div class="slide-content" style="background: url('{% static 'img/slide2.jpg' %}') center/cover;">
+                            <div>
+                                <h2 class="fw-bold mb-3">Validação Instantânea</h2>
+                                <p class="lead mb-4">Empresas podem verificar a autenticidade dos certificados em segundos</p>
+                                <a href="#verification" class="btn btn-accent">Como Verificar</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 3 -->
+                    <div class="swiper-slide">
+                        <div class="slide-content" style="background: url('{% static 'img/slide3.jpg' %}') center/cover;">
+                            <div>
+                                <h2 class="fw-bold mb-3">Workshops Setoriais</h2>
+                                <p class="lead mb-4">Capacitação para diferentes áreas profissionais com certificação digital</p>
+                                <a href="#" class="btn btn-accent">Ver Calendário</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="step">
-                    <i class="fas fa-qrcode"></i>
-                    <h3>Passo 2: Escaneie o QR Code</h3>
-                    <p>Use a câmera do seu dispositivo para escanear o QR Code.</p>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="stats-card h-100">
+                        <div class="stats-number" data-count="5000">+100</div>
+                        <h5>Certificados Emitidos</h5>
+                        <p class="small text-muted mb-0">Com segurança blockchain</p>
+                    </div>
                 </div>
-                <div class="step">
-                    <i class="fas fa-check-circle"></i>
-                    <h3>Passo 3: Valide</h3>
-                    <p>Confirme a autenticidade do certificado em segundos.</p>
+                <div class="col-md-3">
+                    <div class="stats-card h-100">
+                        <div class="stats-number" data-count="100">+140</div>
+                        <h5>Autenticidade Garantida</h5>
+                        <p class="small text-muted mb-0">Documentos verificáveis</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card h-100">
+                        <div class="stats-number" data-count="24">100%</div>
+                        <h5>Disponibilidade</h5>
+                        <p class="small text-muted mb-0">Verificação 24/24</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card h-100">
+                        <div class="stats-number" data-count="0">0</div>
+                        <h5>Fraudes Detectadas</h5>
+                        <p class="small text-muted mb-0">Sistema seguro</p>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- SEÇÃO DE DEPOIMENTOS -->
-        <div class="testimonials">
-            <h2>Depoimentos</h2>
-            <div class="testimonial-cards">
-                <div class="testimonial-card">
-                    <img src="https://via.placeholder.com/80" alt="Usuário 1">
-                    <h3>Nelson Muquissi</h3>
-                    <p>"A plataforma é incrível! Validar meu certificado foi muito fácil e rápido."</p>
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Tecnologia Avançada</h2>
+                <p class="lead text-muted">Soluções inovadoras para gestão de credenciais acadêmicas</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Segurança Blockchain</h3>
+                        <p class="text-muted">Tecnologia distribuída para garantir a autenticidade e integridade dos certificados.</p>
+                        <a href="#" class="text-primary small fw-bold">Saiba mais <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
                 </div>
-                <div class="testimonial-card">
-                    <img src="https://via.placeholder.com/80" alt="Usuário 2">
-                    <h3>Pedro Bundi</h3>
-                    <p>"Adorei a segurança e a praticidade. Recomendo a todos!"</p>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <h3>Verificação Instantânea</h3>
+                        <p class="text-muted">Valide certificados em segundos com códigos QR exclusivos e assinatura digital.</p>
+                        <a href="#" class="text-primary small fw-bold">Saiba mais <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
                 </div>
-                <div class="testimonial-card">
-                    <img src="https://via.placeholder.com/80" alt="Usuário 3">
-                    <h3>Joana Francisco</h3>
-                    <p>"Ótima experiência. O suporte é muito eficiente."</p>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </div>
+                        <h3>Acesso Online</h3>
+                        <p class="text-muted">Certificados disponíveis 24/7 em formato digital, acessível de qualquer dispositivo.</p>
+                        <a href="#" class="text-primary small fw-bold">Saiba mais <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h3>Portal Personalizado</h3>
+                        <p class="text-muted">Área exclusiva para alunos acessarem e gerenciarem seus certificados.</p>
+                        <a href="#" class="text-primary small fw-bold">Saiba mais <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Gestão Inteligente</h3>
+                        <p class="text-muted">Relatórios e análises avançadas para administradores e coordenadores.</p>
+                        <a href="#" class="text-primary small fw-bold">Saiba mais <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3>Design Responsivo</h3>
+                        <p class="text-muted">Interface otimizada para todos os dispositivos, de smartphones a desktops.</p>
+                        <a href="#" class="text-primary small fw-bold">Saiba mais <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- SEÇÃO DE PERGUNTAS FREQUENTES -->
-        <div class="faq">
-            <h2>Perguntas Frequentes</h2>
-            <div class="faq-item">
-                <h3>Como posso validar meu certificado?</h3>
-                <p>Basta inserir o código único ou escanear o QR Code na página de validação.</p>
+    <section id="sectors" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Cursos Técnicos</h2>
+                <p class="lead text-muted">Formação profissional de qualidade com certificação reconhecida</p>
             </div>
-            <div class="faq-item">
-                <h3>É seguro usar a plataforma?</h3>
-                <p>Sim, utilizamos criptografia avançada para garantir a segurança dos dados.</p>
+            
+            <div class="row g-4">
+                <!-- Design e Artes -->
+                <div class="col-md-4">
+                    <div class="sector-card">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Design e Artes">
+                        <div class="sector-overlay">
+                            <h4 class="mb-1">Design e Artes</h4>
+                            <p class="small mb-0">Design Gráfico, Design de Produto, Artes Visuais</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informática -->
+                <div class="col-md-4">
+                    <div class="sector-card">
+                        <img src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Informática">
+                        <div class="sector-overlay">
+                            <h4 class="mb-1">Informática</h4>
+                            <p class="small mb-0">Programação, Redes, Manutenção de Computadores</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Eletrônica -->
+                <div class="col-md-4">
+                    <div class="sector-card">
+                        <img src="https://images.unsplash.com/photo-1551269901-5c5e14c25df7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Eletrônica">
+                        <div class="sector-overlay">
+                            <h4 class="mb-1">Eletrônica</h4>
+                            <p class="small mb-0">Circuitos Eletrônicos, Automação, Instrumentação</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Energias Renováveis -->
+                <div class="col-md-4">
+                    <div class="sector-card">
+                        <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Energias Renováveis">
+                        <div class="sector-overlay">
+                            <h4 class="mb-1">Energias Renováveis</h4>
+                            <p class="small mb-0">Solar, Eólica, Biomassa, Eficiência Energética</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mecânica - NOVA IMAGEM ADICIONADA -->
+                <div class="col-md-4">
+                    <div class="sector-card">
+                        <img src="https://images.unsplash.com/photo-1581094271901-8022df4466f9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Mecânica">
+                        <div class="sector-overlay">
+                            <h4 class="mb-1">Mecânica</h4>
+                            <p class="small mb-0">Mecânica Industrial, Automóvel, Máquinas e Ferramentas</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mecatrônica -->
+                <div class="col-md-4">
+                    <div class="sector-card">
+                        <img src="https://images.unsplash.com/photo-1597852074816-d933c7d2b988?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Mecatrônica">
+                        <div class="sector-overlay">
+                            <h4 class="mb-1">Mecatrônica</h4>
+                            <p class="small mb-0">Robótica, Automação Industrial, Controle de Processos</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="faq-item">
-                <h3>Posso validar certificados de qualquer instituição?</h3>
-                <p>Sim, desde que a instituição seja parceira da nossa plataforma.</p>
+            
+            <div class="text-center mt-5">
+                <a href="#" class="btn btn-primary btn-lg px-4">
+                    <i class="fas fa-book-open me-2"></i>Saiba Mais Sobre os Cursos
+                </a>
             </div>
         </div>
-    </main>
+    </section>
 
-    <!-- RODAPÉ -->
-    <footer>
-        &copy; 2025 CertiAuth - Todos os direitos reservados
+    <!-- Verification Section -->
+    <section id="verification" class="py-5 bg-white">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="verification-box">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold mb-3">Verificar Certificado</h2>
+                            <p class="text-muted">Insira o código de verificação para validar a autenticidade do documento</p>
+                        </div>
+                        
+                        <form id="certificadoForm" class="row g-3">
+                            <div class="col-md-9">
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-white"><i class="fas fa-key text-primary"></i></span>
+                                    <input type="text" id="codigoInput" name="codigo_verificacao" class="form-control" 
+                                           placeholder="Ex: b17979de-2054-4d78-bed5-e1bcf435e253" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" onclick="verificarCertificado()" class="btn btn-primary btn-lg w-100 h-100">
+                                    <i class="fas fa-search me-2"></i> Verificar
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <script>
+                        function verificarCertificado() {
+                            const codigo = document.getElementById('codigoInput').value.trim();
+                            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+                            
+                            if (uuidRegex.test(codigo)) {
+                                window.location.href = `/certificados/verificar/${codigo}/`;
+                            } else {
+                                alert('Por favor, insira um código de verificação válido no formato UUID (ex: b17979de-2054-4d78-bed5-e1bcf435e253)');
+                            }
+                        }
+                        </script>
+                        
+                        <div class="mt-4 text-center">
+                            <p class="text-muted mb-3">Como verificar seu certificado?</p>
+                            <div class="d-flex justify-content-center flex-wrap gap-3">
+                                <div class="text-center">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+                                         style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
+                                        <span class="text-primary fw-bold">1</span>
+                                    </div>
+                                    <small class="d-block mt-2">Localize o código</small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+                                         style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
+                                        <span class="text-primary fw-bold">2</span>
+                                    </div>
+                                    <small class="d-block mt-2">Insira acima</small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+                                         style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
+                                        <span class="text-primary fw-bold">3</span>
+                                    </div>
+                                    <small class="d-block mt-2">Confirme os dados</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Depoimentos</h2>
+                <p class="lead text-muted">O que dizem alunos e parceiros sobre nosso sistema</p>
+            </div>
+            
+            <div class="swiper testimonial-slider">
+                <div class="swiper-wrapper">
+                    <!-- Testimonial 1 -->
+                    <div class="swiper-slide">
+                        <div class="testimonial-card">
+                            <div class="d-flex align-items-center mb-4">
+                                <img src="{% static 'img/testimonial1.jpg' %}" class="testimonial-img me-3" alt="Depoimento">
+                                <div>
+                                    <h5 class="mb-1">Nelson Muquissi</h5>
+                                    <small class="text-muted">Estudante Informática</small>
+                                </div>
+                            </div>
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="mb-0">"O sistema de certificados digitais do IPIZ revolucionou o processo de contratação. A verificação instantânea fornece segurança e agilidade na avaliação de candidatos."</p>
+                        </div>
+                    </div>
+                    <!-- Testimonial 2 -->
+                    <div class="swiper-slide">
+                        <div class="testimonial-card">
+                            <div class="d-flex align-items-center mb-4">
+                                <img src="{% static 'img/testimonial2.jpg' %}" class="testimonial-img me-3" alt="Depoimento">
+                                <div>
+                                    <h5 class="mb-1">Pricila Pessoa</h5>
+                                    <small class="text-muted">Estudante Informática</small>
+                                </div>
+                            </div>
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="mb-0">"Como aluna, adorei a facilidade de acessar meus certificados de qualquer lugar. Quando precisei apresentar em uma entrevista, foi rápido e impressionou os recrutadores."</p>
+                        </div>
+                    </div>
+                    <!-- Testimonial 3 -->
+                    <div class="swiper-slide">
+                        <div class="testimonial-card">
+                            <div class="d-flex align-items-center mb-4">
+                                <img src="{% static 'img/testimonial3.jpg' %}" class="testimonial-img me-3" alt="Depoimento">
+                                <div>
+                                    <h5 class="mb-1">Pedro Bundi</h5>
+                                    <small class="text-muted">Estudante Informática</small>
+                                </div>
+                            </div>
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <p class="mb-0">"A verificação rápida dos certificados economiza tempo no nosso processo seletivo. Sabemos que os documentos são autênticos, o que traz segurança para nossa empresa."</p>
+                        </div>
+                    </div>
+                    <!-- Testimonial 4 -->
+                    <div class="swiper-slide">
+                        <div class="testimonial-card">
+                            <div class="d-flex align-items-center mb-4">
+                                <img src="{% static 'img/testimonial4.jpg' %}" class="testimonial-img me-3" alt="Depoimento">
+                                <div>
+                                    <h5 class="mb-1">Joana Francisco</h5>
+                                    <small class="text-muted">Directora Geral</small>
+                                </div>
+                            </div>
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="mb-0">"Como directora, o sistema facilitou muito a emissão e gestão dos certificados. A redução de papelada e a organização digital foram transformadoras para nosso instituto."</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="fw-bold mb-4">Sobre o IPIZ</h2>
+                    <p class="lead">O Instituto Politécnico Industrial de Luanda é referência em educação profissional em Angola.</p>
+                    <p>Com mais de 20 anos de experiência, oferecemos cursos técnicos e profissionalizantes em diversas áreas, formando profissionais qualificados para o mercado de trabalho.</p>
+                    <p>Nosso sistema de certificados digitais foi desenvolvido para garantir a autenticidade e facilitar a verificação das qualificações dos nossos alunos.</p>
+                    <div class="mt-4">
+                        <a href="#" class="btn btn-primary me-3">Nossa História</a>
+                        <a href="#" class="btn btn-outline-primary">Nossos Professores</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Sobre o IPIZ" allowfullscreen class="rounded-3 shadow"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-5 bg-primary text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mb-4 mb-lg-0">
+                    <h2 class="fw-bold mb-3">Pronto para emitir seus certificados digitais?</h2>
+                    <p class="lead mb-0">Junte-se ao IPIZ e ofereça certificação verificável para seus alunos e colaboradores.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="#" class="btn btn-light btn-lg px-4 me-3">Fale Conosco</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4">Acessar Sistema</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <img src="{% static 'img/ipiz-white.png' %}" alt="IPIZ" height="50" class="mb-3">
+                    <p class="mb-4">Instituto Politécnico Industrial de Luanda - Sistema de Certificados Digitais com tecnologia blockchain.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-white"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5 class="mb-3 fw-bold">Links Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Página Inicial</a></li>
+                        <li class="mb-2"><a href="#features" class="text-white-50 text-decoration-none">Funcionalidades</a></li>
+                        <li class="mb-2"><a href="#sectors" class="text-white-50 text-decoration-none">Cursos</a></li>
+                        <li class="mb-2"><a href="#verification" class="text-white-50 text-decoration-none">Verificação</a></li>
+                        <li class="mb-2"><a href="#testimonials" class="text-white-50 text-decoration-none">Depoimentos</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <h5 class="mb-3 fw-bold">Contato</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> Calumbo, Luanda, Angola</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +244 936 327 119</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> secretaria@ipiz.edu.ao</li>
+                        <li class="mb-2"><i class="fas fa-clock me-2"></i> Seg-Sex: 8h00 - 17h00</li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <h5 class="mb-3 fw-bold">Suporte</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Central de Ajuda</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Termos de Uso</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Política de Privacidade</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 small">© {% now "Y" %} IPIZ. Todos os direitos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0 small">Desenvolvido pelo Departamento de TI</p>
+                </div>
+            </div>
+        </div>
     </footer>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
     <script>
-        function validarCertificado() {
-            alert("Redirecionando para a página de validação...");
-            window.location.href = "https://certificados-platform.onrender.com/"
-         }
-    </script>
+        // Initialize Swipers
+        const newsSwiper = new Swiper('.news-slider', {
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            }
+        });
 
+        const testimonialSwiper = new Swiper('.testimonial-slider', {
+            loop: true,
+            autoplay: {
+                delay: 7000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                },
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 30,
+                },
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                },
+            }
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Counter animation for stats
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stats-number');
+            const speed = 200;
+            
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-count');
+                const count = +counter.innerText;
+                const increment = target / speed;
+                
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + increment);
+                    setTimeout(animateCounters, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            });
+        }
+
+        // Intersection Observer for animations
+        function setupScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+                        
+                        // Trigger counter animation for stats section
+                        if (entry.target.id === 'features') {
+                            animateCounters();
+                        }
+                        
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.feature-card, .stats-card, .verification-box, .sector-card, .testimonial-card').forEach(el => {
+                observer.observe(el);
+            });
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            setupScrollAnimations();
+            
+            // Activate current section in navbar
+            const sections = document.querySelectorAll('section');
+            window.addEventListener('scroll', function() {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (pageYOffset >= (sectionTop - 100)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

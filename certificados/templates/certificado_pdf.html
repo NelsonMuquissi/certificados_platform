@@ -1,0 +1,95 @@
+<!-- templates/certificado_pdf.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Certificado {{ certificado.numero_certificado }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { font-size: 18px; font-weight: bold; text-decoration: underline; margin: 15px 0; }
+        .content { margin: 20px 0; line-height: 1.5; }
+        .signature { margin-top: 50px; text-align: right; }
+        .qr-code { float: right; margin: 10px; border: 1px solid #000; padding: 5px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+        .footer { margin-top: 30px; font-size: 12px; text-align: center; }
+        .text-center { text-align: center; }
+        .text-underline { text-decoration: underline; }
+        .text-bold { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>REPÚBLICA DE ANGOLA</h2>
+        <h2>MINISTÉRIO DA EDUCAÇÃO</h2>
+        <h2>INSTITUTO MÉDIO INDUSTRIAL DE LUANDA</h2>
+        <h3 class="title">CERTIFICADO</h3>
+    </div>
+    
+    <div class="content">
+        <div class="qr-code">
+            <img src="{{ certificado.codigo_qr.url }}" alt="Código QR" width="100">
+            <p>Código: {{ certificado.codigo_verificacao }}</p>
+        </div>
+
+        <p class="text-center">
+            <span class="text-bold">{{ certificado.criado_por.get_full_name }}</span>,
+            <em>Directora do Instituto Médio Industrial de Luanda, CERTIFICO em cumprimento do despacho exarado em requerimento que fica arquivado nesta Secretaria, que</em>
+            <span class="text-bold">{{ certificado.estudante.get_full_name }}</span>,
+            <em>natural de {{ certificado.local_nascimento }}, Província de {{ certificado.provincia }}, nascido(a) aos {{ certificado.data_nascimento|date:"d/m/Y" }}, filho(a) de {{ certificado.nome_pai }} e de {{ certificado.nome_mae }}, portador(a) do Bilhete de Identidade nº {{ certificado.numero_identificacao }}, passado pelo Arquivo de Identificação de {{ certificado.emissor_identificacao }} aos {{ certificado.data_emissao_identificacao|date:"d/m/Y" }}.</em>
+        </p>
+        
+        <p class="text-center">
+            <em>CONCLUIU no ano lectivo {{ certificado.ano_letivo }} sob o processo nº {{ certificado.numero_processo }} o Curso Médio de <span class="text-bold">{{ certificado.nome_curso }}</span> da Área de Formação de <span class="text-bold">{{ certificado.area_formacao }}</span> correspondente à <span class="text-bold">{{ certificado.nivel_classe }}</span> do ensino secundário <span class="text-bold">{{ certificado.turno }}</span>, tendo obtido as seguintes notas discriminadas:</em>
+        </p>
+        
+        <table>
+            <tr>
+                <th>Disciplina</th>
+                <th>Nota</th>
+                <th>Valor</th>
+            </tr>
+            {% for resultado in certificado.resultados_disciplinas.all %}
+            <tr>
+                <td>{{ resultado.disciplina.nome }}</td>
+                <td>{{ resultado.nota_numerica }}</td>
+                <td>{{ resultado.nota_literal }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="text-bold">
+                <td>Média do Plano Curricular IPCI</td>
+                <td>{{ certificado.media_curricular }}</td>
+                <td>{{ certificado.get_media_curricular_display }}</td>
+            </tr>
+            <tr class="text-bold">
+                <td>Prova de Aptidão Profissional</td>
+                <td>{{ certificado.prova_aptidao_profissional }}</td>
+                <td>{{ certificado.get_prova_aptidao_profissional_display }}</td>
+            </tr>
+            <tr class="text-bold">
+                <td>Classificação Final do Curso LT PCEP/13</td>
+                <td>{{ certificado.classificacao_final }}</td>
+                <td>{{ certificado.get_classificacao_final_display }}</td>
+            </tr>
+        </table>
+        
+        <p class="text-center">
+            <em>Para efeitos legais é passado o presente CERTIFICADO que consta no livro de registo {{ certificado.livro_registo }}, assinado por mim e autenticado com carimbo à óleo /selo branco em uso neste estabelecimento de ensino.</em>
+        </p>
+        
+        <p class="text-center">Luanda, aos {{ certificado.data_emissao|date:"d/m/Y" }}.</p>
+        
+        <div class="signature">
+            <p>_________________________________</p>
+            <p>{{ certificado.criado_por.get_full_name }}</p>
+            <p>Directora do Instituto Médio Industrial de Luanda</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Este é um documento oficial emitido pelo Instituto Médio Industrial de Luanda</p>
+        <p>Verifique a autenticidade em: {{ settings.BASE_URL }}/verificar/{{ certificado.codigo_verificacao }}/</p>
+    </div>
+</body>
+</html>
