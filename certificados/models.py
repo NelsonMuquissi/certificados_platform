@@ -254,7 +254,7 @@ class Certificado(models.Model):
         super().save(*args, **kwargs)
     
     def gerar_qr_code(self):
-        url_verificacao = f"{settings.BASE_URL}/verificar/{self.codigo_verificacao}/"
+        url_verificacao = f"{settings.BASE_URL}/certificados/verificar/{self.codigo_verificacao}/"
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
