@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db import IntegrityError
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     Usuario, Aluno, Provincia, AreaFormacao, Curso, Disciplina, 
@@ -129,10 +130,9 @@ class CertificadoAdmin(admin.ModelAdmin):
             if not obj.prova_aptidao_profissional:
                 obj.prova_aptidao_profissional = 0.00
         
-        # Garante salvamento mesmo se faltarem alguns dados
         try:
             super().save_model(request, obj, form, change)
-        except IntegrityError:
+        except Exception as e:  # Captura qualquer exceção, não apenas IntegrityError
             # Se houver erro, preenche valores padrão e tenta novamente
             if not hasattr(obj, 'media_curricular'):
                 obj.media_curricular = 0.00

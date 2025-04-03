@@ -223,7 +223,16 @@ class Certificado(models.Model):
                 numero_certificado__startswith=f'IPIC-{ano_atual}'
             ).order_by('-numero_certificado').first()
             
-            self.numero_certificado = f"IPIC-{ano_atual}-{ultimo_numero + 1:04d}" if ultimo_certificado else f"IPIC-{ano_atual}-0001"
+            if ultimo_certificado:
+                # Extrai o último número do certificado existente
+                try:
+                    ultimo_numero = int(ultimo_certificado.numero_certificado.split('-')[-1])
+                    self.numero_certificado = f"IPIC-{ano_atual}-{ultimo_numero + 1:04d}"
+                except (IndexError, ValueError):
+                    # Caso o formato não seja o esperado, começa do zero
+                    self.numero_certificado = f"IPIC-{ano_atual}-0001"
+            else:
+                self.numero_certificado = f"IPIC-{ano_atual}-0001"
         
         if not self.ano_letivo and hasattr(self, 'matricula'):
             self.ano_letivo = self.matricula.ano_letivo
