@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Certificados IPIC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="{% static 'img/ipiz.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Side with Branding -->
+        <div class="login-left">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+            </div>
+            <div style="position: relative; z-index: 2;">
+                <img src="{% static 'img/ipiz.png' %}" alt="IPIZ" class="img-fluid mb-4" style="height: 100px;">
+                <h1 class="display-4 fw-bold mb-3">Área do Aluno</h1>
+                <p class="lead mb-4">Acesse seus certificados digitais e informações acadêmicas de forma segura e rápida.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/" class="btn btn-outline-light">
+                        <i class="fas fa-home me-2"></i> Voltar ao Site
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Side with Login Form -->
+        <div class="login-right">
+            <div class="login-card">
+                <img src="{% static 'img/ipiz.png' %}" alt="IPIZ" class="login-logo mx-auto">
+                <h2 class="login-title text-center">Login do Aluno</h2>
+                
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    Seu nome de usuário e senha não coincidem. Por favor, tente novamente.
+                </div>
+                {% endif %}
+                
+                {% if next %}
+                    {% if user.is_authenticated %}
+                    <div class="alert alert-warning">
+                        Sua conta não tem acesso a esta página. Para continuar, faça login com uma conta que tenha acesso.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Por favor, faça login para acessar esta página.
+                    </div>
+                    {% endif %}
+                {% endif %}
+                
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Email</label>
+                        <input type="text" name="username" id="id_username" class="form-control" required autofocus>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Senha</label>
+                        <input type="password" name="password" id="id_password" class="form-control" required>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Lembrar-me</label>
+                        </div>
+                        <a href="#" class="text-decoration-none small">Esqueceu a senha?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-login w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i> Entrar
+                    </button>
+                    
+                    <div class="login-footer mt-4">
+                        <p class="mb-2">Não tem uma conta? <a href="{% url 'home' %}#contact">Contate a secretaria</a></p>
+                        <p class="small">Problemas para acessar? <a href="{% url 'home' %}#contact">Entre em contato com o suporte</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animação para o formulário de login
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginCard = document.querySelector('.login-card');
+            loginCard.style.opacity = '0';
+            loginCard.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                loginCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                loginCard.style.opacity = '1';
+                loginCard.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

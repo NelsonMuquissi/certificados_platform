@@ -12,7 +12,7 @@ def home(request):
     return render(request, 'index.html')
 
 def login(request):
-    pass
+    return render(request, 'login.html')
 
 @login_required
 def painel_controle(request):
