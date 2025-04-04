@@ -336,7 +336,7 @@
                     <div class="verification-box">
                         <div class="text-center mb-4">
                             <h2 class="fw-bold mb-3">Verificar Certificado</h2>
-                            <p class="text-muted">Insira o código de verificação para validar a autenticidade do documento</p>
+                            <p class="text-muted">Insira o código de verificação <strong>ou número de matrícula</strong> para validar a autenticidade do documento</p>
                         </div>
                         
                         <form id="certificadoForm" class="row g-3">
@@ -344,7 +344,7 @@
                                 <div class="input-group input-group-lg">
                                     <span class="input-group-text bg-white"><i class="fas fa-key text-primary"></i></span>
                                     <input type="text" id="codigoInput" name="codigo_verificacao" class="form-control" 
-                                           placeholder="Ex: b17979de-2054-4d78-bed5-e1bcf435e253" required>
+                                           placeholder="Ex: b17979de-2054-4d78-bed5-e1bcf435e253 ou I1" required>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -357,39 +357,61 @@
                         <script>
                         function verificarCertificado() {
                             const codigo = document.getElementById('codigoInput').value.trim();
-                            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
                             
-                            if (uuidRegex.test(codigo)) {
-                                window.location.href = `/certificados/verificar/${codigo}/`;
-                            } else {
-                                alert('Por favor, insira um código de verificação válido no formato UUID (ex: b17979de-2054-4d78-bed5-e1bcf435e253)');
+                            // Remove qualquer mensagem de erro anterior
+                            const errorElement = document.getElementById('verificationError');
+                            if (errorElement) {
+                                errorElement.remove();
                             }
+                            
+                            // Verifica se o campo não está vazio
+                            if (!codigo) {
+                                showError('Por favor, insira um código de verificação ou número de matrícula');
+                                return;
+                            }
+                            
+                            // Se chegou aqui, pode tentar verificar
+                            window.location.href = `/certificados/verificar/${codigo}/`;
+                        }
+    
+                        function showError(message) {
+                            const form = document.getElementById('certificadoForm');
+                            const errorDiv = document.createElement('div');
+                            errorDiv.id = 'verificationError';
+                            errorDiv.className = 'alert alert-danger mt-3';
+                            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
+                            
+                            // Insere após o formulário
+                            form.parentNode.insertBefore(errorDiv, form.nextSibling);
                         }
                         </script>
                         
                         <div class="mt-4 text-center">
-                            <p class="text-muted mb-3">Como verificar seu certificado?</p>
+                            <p class="text-muted mb-3">Métodos de verificação disponíveis:</p>
                             <div class="d-flex justify-content-center flex-wrap gap-3">
                                 <div class="text-center">
                                     <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
                                          style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
-                                        <span class="text-primary fw-bold">1</span>
+                                        <i class="fas fa-qrcode text-primary"></i>
                                     </div>
-                                    <small class="d-block mt-2">Localize o código</small>
+                                    <small class="d-block mt-2">Código QR</small>
+                                    <small class="text-muted">(contém UUID)</small>
                                 </div>
                                 <div class="text-center">
                                     <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
                                          style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
-                                        <span class="text-primary fw-bold">2</span>
+                                        <i class="fas fa-id-card text-primary"></i>
                                     </div>
-                                    <small class="d-block mt-2">Insira acima</small>
+                                    <small class="d-block mt-2">Nº Matrícula</small>
+                                    <small class="text-muted">(ex: I1)</small>
                                 </div>
                                 <div class="text-center">
                                     <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
                                          style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
-                                        <span class="text-primary fw-bold">3</span>
+                                        <i class="fas fa-key text-primary"></i>
                                     </div>
-                                    <small class="d-block mt-2">Confirme os dados</small>
+                                    <small class="d-block mt-2">Código UUID</small>
+                                    <small class="text-muted">(ex: b17979de-...)</small>
                                 </div>
                             </div>
                         </div>
@@ -398,7 +420,6 @@
             </div>
         </div>
     </section>
-
     <!-- Testimonials Section -->
     <section id="testimonials" class="py-5 bg-light">
         <div class="container">

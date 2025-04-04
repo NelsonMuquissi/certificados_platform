@@ -8,6 +8,6 @@ urlpatterns = [
     path('verificar_certificado/', views.login, name='verificar_certificado'),
     path('certificados/<int:certificado_id>/', views.visualizar_certificado, name='visualizar_certificado'),
     path('certificados/<int:certificado_id>/descarregar/', views.descarregar_certificado, name='descarregar_certificado'),
-    path('verificar/<uuid:codigo_verificacao>/', views.verificar_certificado, name='verificar_certificado'),
-    # Outras URLs...
+    path('verificar/<str:identificador>/', views.verificar_certificado, name='verificar_certificado'),
+        # Outras URLs...
 ]

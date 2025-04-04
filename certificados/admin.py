@@ -81,15 +81,14 @@ class ResultadoDisciplinaInline(admin.TabularInline):
         return qs.select_related('disciplina')
 
 class CertificadoAdmin(admin.ModelAdmin):
-    list_display = ('numero_certificado', 'matricula', 'data_emissao', 'classificacao_final', 'ativo')
+    list_display = ('numero_certificado', 'numero_processo', 'matricula', 'data_emissao', 'classificacao_final', 'ativo')
     list_filter = ('data_emissao', 'ativo', 'matricula__curso')
-    search_fields = ('numero_certificado', 'matricula__aluno__nome_completo')
+    search_fields = ('numero_certificado', 'matricula__aluno__nome_completo', 'numero_processo')
     
-    # Campos que não podem ser editados
     readonly_fields = (
-        'numero_certificado', 'ano_letivo', 'media_curricular',
-        'classificacao_final', 'codigo_verificacao', 'livro_registo',
-        'codigo_qr_preview', 'data_criacao', 'data_atualizacao'  # Campos automáticos
+        'numero_certificado', 'numero_processo', 'ano_letivo', 
+        'media_curricular', 'classificacao_final', 'codigo_verificacao', 
+        'livro_registo', 'codigo_qr_preview', 'data_criacao', 'data_atualizacao'
     )
     
     autocomplete_fields = ['matricula', 'diretor', 'criado_por']
@@ -100,7 +99,7 @@ class CertificadoAdmin(admin.ModelAdmin):
             'fields': ('numero_certificado', 'matricula', 'numero_processo', 'livro_registo')
         }),
         ('Datas', {
-            'fields': ('data_emissao', 'ano_letivo')  # Apenas data_emissao é editável
+            'fields': ('data_emissao', 'ano_letivo')
         }),
         ('Direção', {
             'fields': ('diretor', 'cargo_diretor')
@@ -112,7 +111,7 @@ class CertificadoAdmin(admin.ModelAdmin):
             'fields': ('codigo_verificacao', 'codigo_qr_preview', 'ativo')
         }),
         ('Metadados', {
-            'fields': ('criado_por', 'data_criacao', 'data_atualizacao'),  # Somente leitura
+            'fields': ('criado_por', 'data_criacao', 'data_atualizacao'),
             'classes': ('collapse',)
         }),
     )
@@ -124,22 +123,34 @@ class CertificadoAdmin(admin.ModelAdmin):
     codigo_qr_preview.allow_tags = True
     codigo_qr_preview.short_description = 'QR Code'
     
+    def get_exclude(self, request, obj=None):
+        """Garante que numero_processo não aparece no formulário de adição"""
+        excluded = super().get_exclude(request, obj) or []
+        if obj is None:  # Durante a criação
+            return list(excluded) + ['numero_processo']
+        return excluded
+    
     def save_model(self, request, obj, form, change):
         if not obj.pk:  # Novo certificado
             obj.criado_por = request.user
             if not obj.prova_aptidao_profissional:
                 obj.prova_aptidao_profissional = 0.00
+            
+            # Garante que o numero_processo é definido antes do primeiro save
+            if hasattr(obj, 'matricula'):
+                obj.numero_processo = obj.matricula.numero_matricula
         
         try:
             super().save_model(request, obj, form, change)
-        except Exception as e:  # Captura qualquer exceção, não apenas IntegrityError
-            # Se houver erro, preenche valores padrão e tenta novamente
+        except Exception as e:
+            # Fallback para garantir que os campos obrigatórios tenham valores
             if not hasattr(obj, 'media_curricular'):
                 obj.media_curricular = 0.00
             if not hasattr(obj, 'classificacao_final'):
                 obj.classificacao_final = 0.00
-            super().save_model(request, obj, form, change)
-        
+            if not hasattr(obj, 'numero_processo') and hasattr(obj, 'matricula'):
+                obj.numero_processo = obj.matricula.numero_matricula
+            super().save_model(request, obj, form, change)       
         
 class PedidoCorrecaoAdmin(admin.ModelAdmin):
     list_display = ('certificado', 'solicitado_por', 'data_solicitacao', 'estado')

@@ -7,6 +7,9 @@ from .forms import FormularioCertificado, FormularioPedidoCorrecao
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 import io
+from django.core.exceptions import ValidationError
+import uuid
+from django.http import Http404
 
 def home(request):
     return render(request, 'index.html')
@@ -58,8 +61,43 @@ def descarregar_certificado(request, certificado_id):
     
     return HttpResponse("Erro ao gerar PDF", status=500)
 
-def verificar_certificado(request, codigo_verificacao):
+"""def verificar_certificado(request, codigo_verificacao):
     certificado = get_object_or_404(Certificado, codigo_verificacao=codigo_verificacao, ativo=True)
-    return render(request, 'verificacao_certificado.html', {'certificado': certificado})
+    return render(request, 'verificacao_certificado.html', {'certificado': certificado})"""
 
-# Outras vistas para pedidos de correção, gestão de certificados, etc.
+def verificar_certificado(request, identificador):
+    """
+    Verifica certificado tanto por código de verificação (UUID) quanto por número de matrícula
+    """
+    try:
+        # Tenta primeiro como UUID (código de verificação)
+        try:
+            # Verifica se é um UUID válido
+            uuid_obj = uuid.UUID(identificador)
+            certificado = get_object_or_404(
+                Certificado, 
+                codigo_verificacao=uuid_obj,
+                ativo=True
+            )
+            metodo_verificacao = 'código de verificação'
+        except (ValueError, AttributeError):
+            # Se não for UUID válido, tenta como número de matrícula
+            certificado = get_object_or_404(
+                Certificado, 
+                matricula__numero_matricula=identificador.upper(),
+                ativo=True
+            )
+            metodo_verificacao = 'número de matrícula'
+            
+    except Http404:
+        # Se ambos falharem, mostra página de erro
+        return render(request, 'verificacao_certificado.html', {
+            'invalido': True,
+            'identificador': identificador
+        })
+    
+    return render(request, 'verificacao_certificado.html', {
+        'certificado': certificado,
+        'metodo_verificacao': metodo_verificacao,
+        'valido': True
+    })

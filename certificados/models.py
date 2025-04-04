@@ -116,6 +116,11 @@ class Curso(models.Model):
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
     area_formacao = models.ForeignKey(AreaFormacao, on_delete=models.PROTECT)
     duracao_anos = models.PositiveSmallIntegerField()
+    identificador_matricula = models.CharField(
+        max_length=10,
+        unique=True,
+        help_text="Identificador único para geração do número de matrícula (ex: I para Informática, M para Mecânica)"
+    )
     
     def __str__(self):
         return f"{self.get_tipo_display()} de {self.nome}"
@@ -142,16 +147,17 @@ class CursoDisciplina(models.Model):
 
 class Matricula(models.Model):
     TURNO_CHOICES = (
-        ('DIURNO', 'Diurno'),
+        ('MANHA', 'Manha'),
+        ('TARDE', 'Tarde'),
         ('NOTURNO', 'Noturno'),
     )
     
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='matriculas')
     curso = models.ForeignKey(Curso, on_delete=models.PROTECT)
-    numero_matricula = models.CharField(max_length=20, unique=True)
+    numero_matricula = models.CharField(max_length=20, unique=True, editable=False)  # Removido o editable=True
     data_matricula = models.DateField()
     ano_letivo = models.CharField(max_length=9)  # Formato: 2020/2021
-    nivel_classe = models.CharField(max_length=20)  # ex: "13ª classe"
+    nivel_classe = models.CharField(max_length=20, default='13')  # ex: "13ª classe"
     turno = models.CharField(max_length=10, choices=TURNO_CHOICES)
     ativo = models.BooleanField(default=True)
     
@@ -160,12 +166,36 @@ class Matricula(models.Model):
     
     def __str__(self):
         return f"{self.aluno} - {self.curso} ({self.ano_letivo})"
+    
+    def save(self, *args, **kwargs):
+        if not self.numero_matricula:
+            # Usa o identificador_matricula do curso
+            identificador = self.curso.identificador_matricula.upper()
+            
+            # Encontrar o último número de matrícula no sistema (independente do curso)
+            ultima_matricula = Matricula.objects.all().order_by('-id').first()
+            
+            if ultima_matricula:
+                try:
+                    # Extrai o número da última matrícula
+                    ultimo_numero = int(ultima_matricula.numero_matricula[1:])
+                    novo_numero = ultimo_numero + 1
+                except (ValueError, IndexError):
+                    # Se houver erro na conversão, começa do 1
+                    novo_numero = 1
+            else:
+                # Primeira matrícula do sistema
+                novo_numero = 1
+            
+            self.numero_matricula = f"{identificador}{novo_numero}"
+        
+        super().save(*args, **kwargs)
 
 class Certificado(models.Model):
     # Identificação
-    matricula = models.ForeignKey(Matricula, on_delete=models.PROTECT, related_name='certificados')
+    matricula = models.ForeignKey('Matricula', on_delete=models.PROTECT, related_name='certificados')
     numero_certificado = models.CharField(max_length=20, unique=True, editable=False)
-    numero_processo = models.CharField(max_length=20)
+    numero_processo = models.CharField(max_length=20, editable=False)
     livro_registo = models.CharField(max_length=50, editable=False)
     
     # Datas importantes
@@ -173,8 +203,8 @@ class Certificado(models.Model):
     ano_letivo = models.CharField(max_length=9, editable=False)
     
     # Direção responsável
-    diretor = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='certificados_emitidos')
-    cargo_diretor = models.CharField(max_length=100, default='Directora do Instituto Médio Industrial de Luanda')
+    diretor = models.ForeignKey('Usuario', on_delete=models.PROTECT, related_name='certificados_emitidos')
+    cargo_diretor = models.CharField(max_length=100, default='Directora do Instituto Politécnico Industrial do Calumbo')
     
     # Resultados acadêmicos
     media_curricular = models.DecimalField(
@@ -204,65 +234,48 @@ class Certificado(models.Model):
     ativo = models.BooleanField(default=True)
     
     # Metadados
-    criado_por = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='certificados_criados')
+    criado_por = models.ForeignKey('Usuario', on_delete=models.SET_NULL, null=True, related_name='certificados_criados')
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True) 
     
     class Meta:
         ordering = ['-data_emissao']
         verbose_name_plural = 'Certificados'
-    
+        
     def __str__(self):
         return f"Certificado {self.numero_certificado} - {self.matricula.aluno}"
-    
-    def save(self, *args, **kwargs):
-        # Configura valores iniciais obrigatórios
-        if not self.numero_certificado:
-            ano_atual = timezone.now().year
-            ultimo_certificado = Certificado.objects.filter(
-                numero_certificado__startswith=f'IPIC-{ano_atual}'
-            ).order_by('-numero_certificado').first()
+        
+    def gerar_numero_certificado(self):
+        """Gera um número de certificado único no formato IPIC-YYYY-NNNN"""
+        ano_atual = timezone.now().year
+        ultimo_certificado = Certificado.objects.filter(
+            numero_certificado__startswith=f'IPIC-{ano_atual}'
+        ).order_by('-numero_certificado').first()
             
-            if ultimo_certificado:
-                # Extrai o último número do certificado existente
-                try:
-                    ultimo_numero = int(ultimo_certificado.numero_certificado.split('-')[-1])
-                    self.numero_certificado = f"IPIC-{ano_atual}-{ultimo_numero + 1:04d}"
-                except (IndexError, ValueError):
-                    # Caso o formato não seja o esperado, começa do zero
-                    self.numero_certificado = f"IPIC-{ano_atual}-0001"
-            else:
+        if ultimo_certificado:
+            try:
+                ultimo_numero = int(ultimo_certificado.numero_certificado.split('-')[-1])
+                self.numero_certificado = f"IPIC-{ano_atual}-{ultimo_numero + 1:04d}"
+            except (IndexError, ValueError):
                 self.numero_certificado = f"IPIC-{ano_atual}-0001"
+        else:
+            self.numero_certificado = f"IPIC-{ano_atual}-0001"
         
-        if not self.ano_letivo and hasattr(self, 'matricula'):
-            self.ano_letivo = self.matricula.ano_letivo
-        
-        if not self.livro_registo:
-            self.livro_registo = f"{timezone.now().strftime('%d%m%y')}_{slugify(self.numero_certificado)}"
-        
-        # Primeiro salvamento para obter ID
-        super().save(*args, **kwargs)
-        
-        # Cálculos que dependem de relacionamentos
+    def atualizar_medias(self):
+        """Atualiza as médias e classificação final com a nova fórmula"""
         if hasattr(self, 'resultados_disciplinas'):
-            self.media_curricular = round(self.resultados_disciplinas.aggregate(
+            media = self.resultados_disciplinas.aggregate(
                 media=Avg('nota_numerica')
-            )['media'] or 0, 2)
-        
-        # Calcula classificação final
+            )['media'] or 0
+            self.media_curricular = round(media, 2)
+            
         self.classificacao_final = round(
-            (self.media_curricular + self.prova_aptidao_profissional) / 2, 
+            (self.media_curricular * 2 + self.prova_aptidao_profissional) / 3, 
             2
         )
         
-        # Gera QR code se necessário
-        if not self.codigo_qr:
-            self.gerar_qr_code()
-        
-        # Salvamento final com todos os dados
-        super().save(*args, **kwargs)
-    
     def gerar_qr_code(self):
+        """Gera o código QR para verificação do certificado"""
         url_verificacao = f"{settings.BASE_URL}/certificados/verificar/{self.codigo_verificacao}/"
         qr = qrcode.QRCode(
             version=1,
@@ -272,14 +285,54 @@ class Certificado(models.Model):
         )
         qr.add_data(url_verificacao)
         qr.make(fit=True)
-        
+            
         img = qr.make_image(fill_color="black", back_color="white")
-        
+            
         buffer = BytesIO()
         img.save(buffer, format="PNG")
         nome_arquivo = f'certificado_{self.codigo_verificacao}.png'
-        
+            
         self.codigo_qr.save(nome_arquivo, File(buffer), save=False)
+        
+    def clean(self):
+        """Garante que o numero_processo sempre corresponde à matrícula"""
+        super().clean()
+        if hasattr(self, 'matricula') and self.matricula.numero_matricula != self.numero_processo:
+            self.numero_processo = self.matricula.numero_matricula
+        
+    def save(self, *args, **kwargs):
+        # Configura valores iniciais obrigatórios
+        if not self.numero_certificado:
+            self.gerar_numero_certificado()
+                
+        # Garante que temos uma matrícula associada
+        if not hasattr(self, 'matricula'):
+            raise ValueError("Certificado deve estar associado a uma matrícula")
+                
+        # Define o número de processo como o número de matrícula
+        if not self.numero_processo:
+            self.numero_processo = self.matricula.numero_matricula
+                
+        # Define o ano letivo
+        if not self.ano_letivo:
+            self.ano_letivo = self.matricula.ano_letivo
+                
+        # Gera o livro de registro
+        if not self.livro_registo:
+            self.livro_registo = f"{timezone.now().strftime('%d%m%y')}_{slugify(self.numero_certificado)}"
+                
+        # Primeiro salvamento para obter ID
+        super().save(*args, **kwargs)
+                
+        # Atualiza cálculos que dependem de relacionamentos
+        self.atualizar_medias()
+                
+        # Gera QR code se necessário
+        if not self.codigo_qr:
+            self.gerar_qr_code()
+                
+        # Salvamento final com todos os dados
+        super().save(*args, **kwargs)
 
 class ResultadoDisciplina(models.Model):
     certificado = models.ForeignKey(Certificado, on_delete=models.CASCADE, related_name='resultados_disciplinas')
@@ -318,7 +371,7 @@ class ResultadoDisciplina(models.Model):
         else: return "Insuficiente"
 
 class ConfiguracaoSistema(models.Model):
-    nome_instituicao = models.CharField(max_length=200, default="Instituto Médio Industrial de Luanda")
+    nome_instituicao = models.CharField(max_length=200, default="Instituto Politecnico Industrial do Icolo e Bengo")
     endereco_instituicao = models.TextField(default="Luanda, Angola")
     ministro_educacao = models.CharField(max_length=100, default="Ministério da Educação")
     texto_certificado = models.TextField(
