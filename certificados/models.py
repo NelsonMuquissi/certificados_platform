@@ -9,6 +9,7 @@ import uuid
 from django.utils import timezone
 from django.db.models import Avg
 from django.utils.text import slugify
+from django.contrib.auth.hashers import make_password
 
 class UsuarioManager(BaseUserManager):
     def create_superuser(self, username, email, password, **extra_fields):
@@ -92,11 +93,38 @@ class Aluno(models.Model):
     emissor_identificacao = models.CharField(max_length=100)
     foto = models.ImageField(upload_to='alunos/fotos/', null=True, blank=True)
     
+    # Campos para autenticação
+    email = models.EmailField(unique=True, null=True, blank=True)
+    password = models.CharField(max_length=128)  # Senha armazenada como hash
+    conta_habilitada = models.BooleanField(default=False, 
+        help_text="Se a conta está habilitada para fazer login")
+    ultimo_login = models.DateTimeField(null=True, blank=True)
+    
     class Meta:
         verbose_name_plural = 'Alunos'
     
     def __str__(self):
         return self.nome_completo
+    
+    def set_password(self, raw_password):
+        """Define a senha do aluno (armazenada como hash)"""
+        self.password = make_password(raw_password)
+    
+    def check_password(self, raw_password):
+        """Verifica se a senha fornecida está correta"""
+        from django.contrib.auth.hashers import check_password
+        return check_password(raw_password, self.password)
+    
+    def save(self, *args, **kwargs):
+        # Se é um novo aluno e não tem senha definida, usa o número de identificação como senha
+        if not self.pk and not self.password:
+            self.set_password(self.numero_identificacao)
+        
+        # Garante que o email está em lowercase
+        if self.email:
+            self.email = self.email.lower()
+            
+        super().save(*args, **kwargs)
 
 class AreaFormacao(models.Model):
     nome = models.CharField(max_length=100, unique=True)
