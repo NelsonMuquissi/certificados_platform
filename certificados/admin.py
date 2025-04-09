@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import IntegrityError
 from django.contrib.auth.admin import UserAdmin
 from .models import (
-    Usuario, Aluno, Provincia, AreaFormacao, Curso, Disciplina, 
+    Usuario, Aluno, AreaFormacao, Curso, Disciplina, 
     CursoDisciplina, Matricula, Certificado, ResultadoDisciplina,
     PedidoCorrecao, RegistroAuditoria, ConfiguracaoSistema
 )
@@ -40,18 +40,14 @@ class AlunoAdmin(admin.ModelAdmin):
     foto_preview.allow_tags = True
     foto_preview.short_description = 'Pré-visualização'
 
-class ProvinciaAdmin(admin.ModelAdmin):
-    list_display = ('nome',)
-    search_fields = ('nome',)
-
 class AreaFormacaoAdmin(admin.ModelAdmin):
     list_display = ('nome', 'codigo')
     search_fields = ('nome', 'codigo')
 
 class DisciplinaAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'codigo', 'carga_horaria')
+    list_display = ('nome', 'codigo')
     search_fields = ('nome', 'codigo')
-    list_filter = ('carga_horaria',)
+    list_filter = ('codigo',)
 
 class CursoDisciplinaInline(admin.TabularInline):
     model = CursoDisciplina
@@ -194,7 +190,6 @@ class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
 # Registro dos modelos
 admin.site.register(Usuario, UsuarioAdmin)
 admin.site.register(Aluno, AlunoAdmin)
-admin.site.register(Provincia, ProvinciaAdmin)
 admin.site.register(AreaFormacao, AreaFormacaoAdmin)
 admin.site.register(Curso, CursoAdmin)
 admin.site.register(Disciplina, DisciplinaAdmin)

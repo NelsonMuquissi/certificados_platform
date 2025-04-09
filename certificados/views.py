@@ -10,11 +10,27 @@ import io
 from django.core.exceptions import ValidationError
 import uuid
 from django.http import Http404
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
 
 def home(request):
     return render(request, 'index.html')
 
 def login(request):
+    return render(request, 'login.html')
+
+def login_aluno(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        senha = request.POST['senha']
+        user = authenticate(request, email=email, password=senha)
+        
+        if user is not None:
+            login(request, user)
+            return redirect('dashboard_aluno')
+        else:
+            messages.error(request, 'Email, senha inválidos ou conta desabilitada.')
+    
     return render(request, 'login.html')
 
 @login_required

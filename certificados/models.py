@@ -10,6 +10,33 @@ from django.utils import timezone
 from django.db.models import Avg
 from django.utils.text import slugify
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError
+
+
+PROVINCIAS_ANGOLA = (
+    ('BENGO', 'Bengo'),
+    ('BENGUELA', 'Benguela'),
+    ('BIE', 'Bié'),
+    ('CABINDA', 'Cabinda'),
+    ('CUANDO_CUBANGO', 'Cuando Cubango'),
+    ('CUANDO', 'Cuando'),
+    ('CUANZA_NORTE', 'Cuanza Norte'),
+    ('CUANZA_SUL', 'Cuanza Sul'),
+    ('CUNENE', 'Cunene'),
+    ('HUAMBO', 'Huambo'),
+    ('HUILA', 'Huíla'),
+    ('LUANDA', 'Luanda'),
+    ('ICOLO E BENGO', 'Icolo e Bengo'),
+    ('LUNDA_NORTE', 'Lunda Norte'),
+    ('LUNDA_SUL', 'Lunda Sul'),
+    ('MALANJE', 'Malanje'),
+    ('MOXICO', 'Moxico'),
+    ('CASSAI ZAMBEZE', 'Cassai Zambeze'),
+    ('NAMIBE', 'Namibe'),
+    ('UIGE', 'Uíge'),
+    ('ZAIRE', 'Zaire'),
+    ('OUTRO', 'Outro (Estrangeiro)'),
+)
 
 class UsuarioManager(BaseUserManager):
     def create_superuser(self, username, email, password, **extra_fields):
@@ -50,7 +77,7 @@ class Usuario(AbstractUser):
         verbose_name='groups',
         blank=True,
         help_text='The groups this user belongs to.',
-        related_name="usuario_groups",  # Nome único para o relacionamento reverso
+        related_name="usuario_groups",
         related_query_name="usuario",
     )
     user_permissions = models.ManyToManyField(
@@ -58,7 +85,7 @@ class Usuario(AbstractUser):
         verbose_name='user permissions',
         blank=True,
         help_text='Specific permissions for this user.',
-        related_name="usuario_permissions",  # Nome único para o relacionamento reverso
+        related_name="usuario_permissions",
         related_query_name="usuario",
     )
 
@@ -68,34 +95,37 @@ class Usuario(AbstractUser):
     def has_perm(self, perm, obj=None):
         return self.is_staff or self.papel in ['ADMIN', 'SECRETARIA', 'DIRECAO']
 
-class Provincia(models.Model):
-    nome = models.CharField(max_length=50, unique=True)
-    
-    def __str__(self):
-        return self.nome
-
 class Aluno(models.Model):
     SEXO_CHOICES = (
         ('M', 'Masculino'),
         ('F', 'Feminino'),
     )
     
+    TIPO_IDENTIFICACAO_CHOICES = (
+        ('BI', 'Bilhete de Identidade'),
+        ('PASSAPORTE', 'Passaporte'),
+    )
+    
     nome_completo = models.CharField(max_length=200)
     sexo = models.CharField(max_length=1, choices=SEXO_CHOICES)
     data_nascimento = models.DateField()
     local_nascimento = models.CharField(max_length=100)
-    provincia = models.ForeignKey(Provincia, on_delete=models.PROTECT)
+    provincia = models.CharField(max_length=20, choices=PROVINCIAS_ANGOLA)
     nome_pai = models.CharField(max_length=100)
     nome_mae = models.CharField(max_length=100)
     numero_identificacao = models.CharField(max_length=20, unique=True)
-    tipo_identificacao = models.CharField(max_length=50, default='Bilhete de Identidade')
+    tipo_identificacao = models.CharField(
+        max_length=50, 
+        choices=TIPO_IDENTIFICACAO_CHOICES, 
+        default='BI'
+    )
     data_emissao_identificacao = models.DateField()
     emissor_identificacao = models.CharField(max_length=100)
     foto = models.ImageField(upload_to='alunos/fotos/', null=True, blank=True)
     
     # Campos para autenticação
     email = models.EmailField(unique=True, null=True, blank=True)
-    password = models.CharField(max_length=128)  # Senha armazenada como hash
+    password = models.CharField(max_length=128, blank=True)
     conta_habilitada = models.BooleanField(default=False, 
         help_text="Se a conta está habilitada para fazer login")
     ultimo_login = models.DateTimeField(null=True, blank=True)
@@ -106,8 +136,24 @@ class Aluno(models.Model):
     def __str__(self):
         return self.nome_completo
     
-    def set_password(self, raw_password):
+    def clean(self):
+        super().clean()
+        # Validação do número de identificação baseado no tipo
+        if self.tipo_identificacao == 'BI':
+            if len(self.numero_identificacao) != 14:
+                raise ValidationError(
+                    {'numero_identificacao': 'O Bilhete de Identidade deve ter exatamente 14 caracteres (ex: xxxxxxxxxLAxxx)'}
+                )
+        elif self.tipo_identificacao == 'PASSAPORTE':
+            if len(self.numero_identificacao) != 8:
+                raise ValidationError(
+                    {'numero_identificacao': 'O Passaporte deve ter exatamente 8 caracteres (ex: Nxxxxxxx)'}
+                )
+    
+    def set_password(self, raw_password=None):
         """Define a senha do aluno (armazenada como hash)"""
+        if raw_password is None:
+            raw_password = self.numero_identificacao
         self.password = make_password(raw_password)
     
     def check_password(self, raw_password):
@@ -116,14 +162,17 @@ class Aluno(models.Model):
         return check_password(raw_password, self.password)
     
     def save(self, *args, **kwargs):
-        # Se é um novo aluno e não tem senha definida, usa o número de identificação como senha
-        if not self.pk and not self.password:
-            self.set_password(self.numero_identificacao)
+        # Se for um novo aluno ou a senha estiver vazia, define a senha como o número de identificação
+        if not self.pk or not self.password:
+            self.set_password()
         
-        # Garante que o email está em lowercase
+        # Garante que o email está em minúsculas
         if self.email:
             self.email = self.email.lower()
             
+        # Executa as validações antes de salvar
+        self.full_clean()
+        
         super().save(*args, **kwargs)
 
 class AreaFormacao(models.Model):
@@ -143,7 +192,7 @@ class Curso(models.Model):
     codigo = models.CharField(max_length=20, unique=True)
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
     area_formacao = models.ForeignKey(AreaFormacao, on_delete=models.PROTECT)
-    duracao_anos = models.PositiveSmallIntegerField()
+    duracao_anos = models.PositiveSmallIntegerField(default=4)
     identificador_matricula = models.CharField(
         max_length=10,
         unique=True,
@@ -156,7 +205,6 @@ class Curso(models.Model):
 class Disciplina(models.Model):
     nome = models.CharField(max_length=100)
     codigo = models.CharField(max_length=20, unique=True)
-    carga_horaria = models.PositiveSmallIntegerField()
     
     def __str__(self):
         return f"{self.codigo} - {self.nome}"
@@ -182,10 +230,10 @@ class Matricula(models.Model):
     
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='matriculas')
     curso = models.ForeignKey(Curso, on_delete=models.PROTECT)
-    numero_matricula = models.CharField(max_length=20, unique=True, editable=False)  # Removido o editable=True
+    numero_matricula = models.CharField(max_length=20, unique=True, editable=False)
     data_matricula = models.DateField()
-    ano_letivo = models.CharField(max_length=9)  # Formato: 2020/2021
-    nivel_classe = models.CharField(max_length=20, default='13')  # ex: "13ª classe"
+    ano_letivo = models.CharField(max_length=9)
+    nivel_classe = models.CharField(max_length=20, default='13')
     turno = models.CharField(max_length=10, choices=TURNO_CHOICES)
     ativo = models.BooleanField(default=True)
     
@@ -197,22 +245,17 @@ class Matricula(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.numero_matricula:
-            # Usa o identificador_matricula do curso
             identificador = self.curso.identificador_matricula.upper()
             
-            # Encontrar o último número de matrícula no sistema (independente do curso)
             ultima_matricula = Matricula.objects.all().order_by('-id').first()
             
             if ultima_matricula:
                 try:
-                    # Extrai o número da última matrícula
                     ultimo_numero = int(ultima_matricula.numero_matricula[1:])
                     novo_numero = ultimo_numero + 1
                 except (ValueError, IndexError):
-                    # Se houver erro na conversão, começa do 1
                     novo_numero = 1
             else:
-                # Primeira matrícula do sistema
                 novo_numero = 1
             
             self.numero_matricula = f"{identificador}{novo_numero}"
@@ -220,21 +263,17 @@ class Matricula(models.Model):
         super().save(*args, **kwargs)
 
 class Certificado(models.Model):
-    # Identificação
-    matricula = models.ForeignKey('Matricula', on_delete=models.PROTECT, related_name='certificados')
+    matricula = models.ForeignKey('Matricula', on_delete=models.PROTECT, related_name='certificados', unique=True)
     numero_certificado = models.CharField(max_length=20, unique=True, editable=False)
-    numero_processo = models.CharField(max_length=20, editable=False)
+    numero_processo = models.CharField(max_length=20, unique=True ,editable=False)
     livro_registo = models.CharField(max_length=50, editable=False)
     
-    # Datas importantes
     data_emissao = models.DateField(default=timezone.now, editable=True)
     ano_letivo = models.CharField(max_length=9, editable=False)
     
-    # Direção responsável
     diretor = models.ForeignKey('Usuario', on_delete=models.PROTECT, related_name='certificados_emitidos')
     cargo_diretor = models.CharField(max_length=100, default='Directora do Instituto Politécnico Industrial do Calumbo')
     
-    # Resultados acadêmicos
     media_curricular = models.DecimalField(
         max_digits=4, 
         decimal_places=2,
@@ -256,12 +295,10 @@ class Certificado(models.Model):
         editable=False
     )
     
-    # Verificação
     codigo_qr = models.ImageField(upload_to='codigos_qr/', blank=True, editable=False)
     codigo_verificacao = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     ativo = models.BooleanField(default=True)
     
-    # Metadados
     criado_por = models.ForeignKey('Usuario', on_delete=models.SET_NULL, null=True, related_name='certificados_criados')
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True) 
@@ -274,7 +311,6 @@ class Certificado(models.Model):
         return f"Certificado {self.numero_certificado} - {self.matricula.aluno}"
         
     def gerar_numero_certificado(self):
-        """Gera um número de certificado único no formato IPIC-YYYY-NNNN"""
         ano_atual = timezone.now().year
         ultimo_certificado = Certificado.objects.filter(
             numero_certificado__startswith=f'IPIC-{ano_atual}'
@@ -290,7 +326,6 @@ class Certificado(models.Model):
             self.numero_certificado = f"IPIC-{ano_atual}-0001"
         
     def atualizar_medias(self):
-        """Atualiza as médias e classificação final com a nova fórmula"""
         if hasattr(self, 'resultados_disciplinas'):
             media = self.resultados_disciplinas.aggregate(
                 media=Avg('nota_numerica')
@@ -298,12 +333,11 @@ class Certificado(models.Model):
             self.media_curricular = round(media, 2)
             
         self.classificacao_final = round(
-            (self.media_curricular * 2 + self.prova_aptidao_profissional) / 3, 
+            ((self.media_curricular * 2) + self.prova_aptidao_profissional) / 3, 
             2
         )
         
     def gerar_qr_code(self):
-        """Gera o código QR para verificação do certificado"""
         url_verificacao = f"{settings.BASE_URL}/certificados/verificar/{self.codigo_verificacao}/"
         qr = qrcode.QRCode(
             version=1,
@@ -323,43 +357,33 @@ class Certificado(models.Model):
         self.codigo_qr.save(nome_arquivo, File(buffer), save=False)
         
     def clean(self):
-        """Garante que o numero_processo sempre corresponde à matrícula"""
         super().clean()
         if hasattr(self, 'matricula') and self.matricula.numero_matricula != self.numero_processo:
             self.numero_processo = self.matricula.numero_matricula
         
     def save(self, *args, **kwargs):
-        # Configura valores iniciais obrigatórios
         if not self.numero_certificado:
             self.gerar_numero_certificado()
                 
-        # Garante que temos uma matrícula associada
         if not hasattr(self, 'matricula'):
             raise ValueError("Certificado deve estar associado a uma matrícula")
                 
-        # Define o número de processo como o número de matrícula
         if not self.numero_processo:
             self.numero_processo = self.matricula.numero_matricula
                 
-        # Define o ano letivo
         if not self.ano_letivo:
             self.ano_letivo = self.matricula.ano_letivo
                 
-        # Gera o livro de registro
         if not self.livro_registo:
             self.livro_registo = f"{timezone.now().strftime('%d%m%y')}_{slugify(self.numero_certificado)}"
                 
-        # Primeiro salvamento para obter ID
         super().save(*args, **kwargs)
                 
-        # Atualiza cálculos que dependem de relacionamentos
         self.atualizar_medias()
                 
-        # Gera QR code se necessário
         if not self.codigo_qr:
             self.gerar_qr_code()
                 
-        # Salvamento final com todos os dados
         super().save(*args, **kwargs)
 
 class ResultadoDisciplina(models.Model):
@@ -382,11 +406,9 @@ class ResultadoDisciplina(models.Model):
         return f"{self.disciplina}: {self.nota_numerica}"
     
     def save(self, *args, **kwargs):
-        # Converter nota numérica para literal
         self.nota_literal = self.converter_para_literal(self.nota_numerica)
         super().save(*args, **kwargs)
         
-        # Atualizar média no certificado
         if self.certificado:
             self.certificado.save()
     
