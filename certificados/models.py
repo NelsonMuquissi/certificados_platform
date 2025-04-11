@@ -122,10 +122,8 @@ class Aluno(models.Model):
     data_emissao_identificacao = models.DateField()
     emissor_identificacao = models.CharField(max_length=100)
     foto = models.ImageField(upload_to='alunos/fotos/', null=True, blank=True)
-    
-    # Campos para autenticação
     email = models.EmailField(unique=True, null=True, blank=True)
-    password = models.CharField(max_length=128, blank=True)
+    senha = models.CharField(max_length=128, blank=True)
     conta_habilitada = models.BooleanField(default=False, 
         help_text="Se a conta está habilitada para fazer login")
     ultimo_login = models.DateTimeField(null=True, blank=True)
@@ -138,7 +136,7 @@ class Aluno(models.Model):
     
     def clean(self):
         super().clean()
-        # Validação do número de identificação baseado no tipo
+        # Validação do número de identificação
         if self.tipo_identificacao == 'BI':
             if len(self.numero_identificacao) != 14:
                 raise ValidationError(
@@ -150,29 +148,18 @@ class Aluno(models.Model):
                     {'numero_identificacao': 'O Passaporte deve ter exatamente 8 caracteres (ex: Nxxxxxxx)'}
                 )
     
-    def set_password(self, raw_password=None):
-        """Define a senha do aluno (armazenada como hash)"""
-        if raw_password is None:
-            raw_password = self.numero_identificacao
-        self.password = make_password(raw_password)
-    
-    def check_password(self, raw_password):
-        """Verifica se a senha fornecida está correta"""
-        from django.contrib.auth.hashers import check_password
-        return check_password(raw_password, self.password)
-    
     def save(self, *args, **kwargs):
-        # Se for um novo aluno ou a senha estiver vazia, define a senha como o número de identificação
-        if not self.pk or not self.password:
-            self.set_password()
-        
-        # Garante que o email está em minúsculas
+        # Define a senha como o número de identificação (hasheado) se estiver vazia
+        if not self.senha:
+            self.senha = make_password(self.numero_identificacao)
+        elif not self.senha.startswith('pbkdf2_'):
+            # Garante que senhas fornecidas manualmente sejam hasheadas
+            self.senha = make_password(self.senha)
+
         if self.email:
             self.email = self.email.lower()
-            
-        # Executa as validações antes de salvar
-        self.full_clean()
         
+        self.full_clean()
         super().save(*args, **kwargs)
 
 class AreaFormacao(models.Model):

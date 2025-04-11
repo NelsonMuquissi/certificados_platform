@@ -1,8 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, JsonResponse
 from django.views import View
-from .models import Certificado, ResultadoDisciplina, PedidoCorrecao, Notificacao, RegistroAuditoria
+from .models import Certificado, ResultadoDisciplina, PedidoCorrecao, Notificacao, RegistroAuditoria, Aluno, Matricula
 from .forms import FormularioCertificado, FormularioPedidoCorrecao
 from django.template.loader import get_template
 from xhtml2pdf import pisa
@@ -12,26 +12,96 @@ import uuid
 from django.http import Http404
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.utils.timezone import now
+from django.contrib.auth.hashers import check_password
+
 
 def home(request):
     return render(request, 'index.html')
 
-def login(request):
+
+def pagina_login(request):
     return render(request, 'login.html')
 
 def login_aluno(request):
-    if request.method == 'POST':
-        email = request.POST['email']
-        senha = request.POST['senha']
-        user = authenticate(request, email=email, password=senha)
-        
-        if user is not None:
-            login(request, user)
-            return redirect('dashboard_aluno')
-        else:
-            messages.error(request, 'Email, senha inválidos ou conta desabilitada.')
+    if request.method == "POST":
+        email = request.POST.get('email')
+        senha = request.POST.get('senha')
+
+        aluno = Aluno.objects.filter(email=email).first()
+
+        if not aluno or not aluno.conta_habilitada:
+            messages.error(request, "Credenciais inválidas ou conta desativada.")
+            return redirect('login')
+
+        if not check_password(senha, aluno.senha):
+            messages.error(request, "Credenciais inválidas.")
+            return redirect('login')
+
+        request.session['aluno_id'] = aluno.id
+        request.session['aluno_nome'] = aluno.nome_completo  # Adicionando nome do aluno na sessão
+        return redirect('painel_aluno')  # Note que agora usa underscore
+
+def painel_aluno(request):
+    if 'aluno_id' not in request.session:
+        messages.error(request, "Por favor, faça login para acessar esta página.")
+        return redirect('login')
     
-    return render(request, 'login.html')
+    try:
+        aluno = Aluno.objects.get(id=request.session['aluno_id'])
+        
+        # Obtém a matrícula ativa mais recente do aluno
+        matricula = Matricula.objects.filter(aluno=aluno, ativo=True).order_by('-data_matricula').first()
+        
+        # Obtém o certificado do aluno (assumindo 1 certificado por aluno)
+        certificado = Certificado.objects.filter(matricula__aluno=aluno).first()
+        
+        # Obtém pedidos de correção do aluno
+        pedidos_correcao = PedidoCorrecao.objects.filter(certificado__matricula__aluno=aluno).order_by('-data_solicitacao')
+        
+        context = {
+            'aluno': aluno,
+            'matricula': matricula,
+            'certificado': certificado,
+            'pedidos_correcao': pedidos_correcao,
+        }
+        
+        return render(request, 'dashboard_aluno.html', context)
+        
+    except Aluno.DoesNotExist:
+        messages.error(request, "Aluno não encontrado.")
+        return redirect('login')
+
+def solicitar_correcao(request):
+    if 'aluno_id' not in request.session:
+        messages.error(request, "Por favor, faça login para acessar esta página.")
+        return redirect('login')
+    
+    if request.method == 'POST':
+        certificado_id = request.POST.get('certificado_id')
+        descricao = request.POST.get('descricao')
+        
+        try:
+            certificado = Certificado.objects.get(id=certificado_id, matricula__aluno__id=request.session['aluno_id'])
+            
+            PedidoCorrecao.objects.create(
+                certificado=certificado,
+                descricao=descricao,
+                estado='PENDENTE'
+            )
+            
+            messages.success(request, "Solicitação de correção enviada com sucesso!")
+            return redirect('painel_aluno')
+            
+        except Certificado.DoesNotExist:
+            messages.error(request, "Certificado não encontrado.")
+            return redirect('painel_aluno')
+    
+    return redirect('painel_aluno')
+
+def logout_aluno(request):
+        request.session.flush()  # Remove todas as informações da sessão
+        return redirect('login_aluno')
 
 @login_required
 def painel_controle(request):

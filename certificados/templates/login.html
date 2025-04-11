@@ -41,36 +41,26 @@
                 <img src="{% static 'img/ipiz.png' %}" alt="IPIZ" class="login-logo mx-auto">
                 <h2 class="login-title text-center">Login do Aluno</h2>
                 
-                {% if form.errors %}
-                <div class="alert alert-danger">
-                    Seu nome de usuário e senha não coincidem. Por favor, tente novamente.
-                </div>
-                {% endif %}
+                {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                 {% endif %}
                 
-                {% if next %}
-                    {% if user.is_authenticated %}
-                    <div class="alert alert-warning">
-                        Sua conta não tem acesso a esta página. Para continuar, faça login com uma conta que tenha acesso.
-                    </div>
-                    {% else %}
-                    <div class="alert alert-info">
-                        Por favor, faça login para acessar esta página.
-                    </div>
-                    {% endif %}
-                {% endif %}
-                
-                <form method="post" action="{% url 'login' %}">
+                <form method="post" action="{% url 'login_aluno' %}">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next }}">
                     
                     <div class="mb-3">
                         <label for="id_username" class="form-label">Email</label>
-                        <input type="text" name="username" id="id_username" class="form-control" required autofocus>
+                        <input type="email" name="email" id="id_username" class="form-control" required autofocus>
                     </div>
                     
                     <div class="mb-3">
                         <label for="id_password" class="form-label">Senha</label>
-                        <input type="password" name="password" id="id_password" class="form-control" required>
+                        <input type="password" name="senha" id="id_password" class="form-control" required>
                     </div>
                     
                     <div class="d-flex justify-content-between align-items-center mb-3">

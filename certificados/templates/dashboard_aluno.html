@@ -1,0 +1,371 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Área do Aluno</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="{% static 'img/ipiz.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/dashboard_aluno.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <img src="{% static 'img/ipiz.png' %}" alt="IPIZ" class="sidebar-logo">
+                <h3 class="sidebar-title">Área do Aluno</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="{% url 'painel_aluno' %}">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#certificado-section">
+                            <i class="fas fa-certificate"></i>
+                            <span>Meu Certificado</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#correcoes-section">
+                            <i class="fas fa-edit"></i>
+                            <span>Solicitar Correção</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#verificacao-section">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Verificar Certificado</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#dados-section">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>Meus Dados</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="{% url 'logout_aluno' %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <!-- Top Navigation -->
+            <header class="dashboard-header">
+                <div class="header-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Pesquisar...">
+                </div>
+                
+                <div class="header-user">
+                    <div class="user-profile">
+                        {% if aluno.foto %}
+                            <img src="{{ aluno.foto.url }}" alt="{{ aluno.nome_completo }}">
+                        {% else %}
+                            <img src="{% static 'img/ipiz.png' %}" alt="{{ aluno.nome_completo }}">
+                        {% endif %}
+                        <span>{{ aluno.nome_completo }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="content-wrapper">
+                <!-- Seção de Boas-Vindas -->
+                <div class="welcome-banner">
+                    <h1>Bem-vindo, {{ aluno.nome_completo }}</h1>
+                    <div class="student-info">
+                        <p><strong>Número de Identificação:</strong> {{ aluno.numero_identificacao }}</p>
+                        <p><strong>Email:</strong> {{ aluno.email }}</p>
+                        {% if matricula %}
+                            <p><strong>Curso:</strong> {{ matricula.curso.nome }}</p>
+                            <p><strong>Matrícula:</strong> {{ matricula.numero_matricula }}</p>
+                            <p><strong>Ano Letivo:</strong> {{ matricula.ano_letivo }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Seção do Certificado -->
+                <div id="certificado-section" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-certificate"></i> Meu Certificado</h2>
+                    </div>
+                    
+                    {% if certificado %}
+                        <div class="certificate-container">
+                            <div class="certificate-info-box">
+                                <h3>{{ certificado.matricula.curso.nome }}</h3>
+                                <div class="certificate-details">
+                                    <p><strong>Número:</strong> {{ certificado.numero_certificado }}</p>
+                                    <p><strong>Data de Emissão:</strong> {{ certificado.data_emissao|date:"d/m/Y" }}</p>
+                                    <p><strong>Classificação Final:</strong> {{ certificado.classificacao_final }}</p>
+                                </div>
+                                <div class="certificate-actions">
+                                    <a href="{% url 'visualizar_certificado' certificado.id %}" class="btn btn-primary">
+                                        <i class="fas fa-eye"></i> Visualizar Certificado
+                                    </a>
+                                    <a href="{% url 'descarregar_certificado' certificado.id %}" class="btn btn-success">
+                                        <i class="fas fa-download"></i> Baixar Certificado
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="certificate-qr">
+                                <img src="{{ certificado.codigo_qr.url }}" alt="Código QR para verificação">
+                                <p class="qr-instruction">Use este código para verificação</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle"></i> Nenhum certificado encontrado. Entre em contato com a secretaria se acredita que isto é um erro.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Seção de Solicitar Correção -->
+                <div id="correcoes-section" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-edit"></i> Solicitar Correção</h2>
+                    </div>
+                    
+                    {% if certificado %}
+                        <div class="correction-info">
+                            <p>Caso encontre algum erro no seu certificado, você pode solicitar uma correção:</p>
+                            
+                            {% if pedidos_correcao %}
+                                <div class="correction-history">
+                                    <h4>Seus Pedidos Anteriores:</h4>
+                                    <div class="correction-list">
+                                        {% for pedido in pedidos_correcao %}
+                                            <div class="correction-item {% if pedido.estado == 'APROVADO' %}approved{% elif pedido.estado == 'REJEITADO' %}rejected{% else %}pending{% endif %}">
+                                                <div class="correction-header">
+                                                    <span class="correction-date">{{ pedido.data_solicitacao|date:"d/m/Y H:i" }}</span>
+                                                    <span class="correction-status">{{ pedido.get_estado_display }}</span>
+                                                </div>
+                                                <div class="correction-desc">
+                                                    <p>{{ pedido.descricao }}</p>
+                                                </div>
+                                                {% if pedido.notas_resolucao %}
+                                                    <div class="correction-response">
+                                                        <strong>Resposta:</strong> {{ pedido.notas_resolucao }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="new-correction">
+                                <h4>Novo Pedido de Correção</h4>
+                                <form method="post" action="{% url 'solicitar_correcao' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="certificado_id" value="{{ certificado.id }}">
+                                    <div class="form-group">
+                                        <label for="descricao">Descreva o erro encontrado:</label>
+                                        <textarea class="form-control" id="descricao" name="descricao" rows="4" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning mt-3">
+                                        <i class="fas fa-paper-plane"></i> Enviar Solicitação
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            Você precisa ter um certificado emitido para solicitar correções.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Seção de Verificação -->
+                <div id="verificacao-section" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-check-circle"></i> Verificar Certificado</h2>
+                    </div>
+                    
+                    <div class="verification-container">
+                        <div class="verification-info">
+                            <h3>Verifique a autenticidade do seu certificado</h3>
+                            <p>Use o código de verificação ou número de matrícula para confirmar a validade do certificado no sistema.</p>
+                            
+                            <div class="verification-options">
+                                <div class="verification-method">
+                                    <h4><i class="fas fa-qrcode"></i> Código QR</h4>
+                                    {% if certificado %}
+                                        <p>Escaneie o código QR no seu certificado ou use o código abaixo:</p>
+                                        <div class="verification-code">
+                                            {{ certificado.codigo_verificacao }}
+                                        </div>
+                                        <a href="{% url 'verificar_certificado' certificado.codigo_verificacao %}" class="btn btn-outline-primary">
+                                            <i class="fas fa-search"></i> Verificar Agora
+                                        </a>
+                                    {% else %}
+                                        <p>Nenhum certificado disponível para verificação.</p>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="verification-method">
+                                    <h4><i class="fas fa-id-card"></i> Número de Matrícula</h4>
+                                    <p>Digite seu número de matrícula para verificação:</p>
+                                    <form method="get" action="{% url 'verificar_certificado' certificado.numero_processo %}">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="matricula" placeholder="Número de Matrícula" 
+                                                   value="{% if matricula %}{{ matricula.numero_matricula }}{% endif %}">
+                                            <button class="btn btn-primary" type="submit">Verificar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção de Dados Pessoais -->
+                <div id="dados-section" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-user-graduate"></i> Meus Dados</h2>
+                    </div>
+                    
+                    <div class="personal-data">
+                        <div class="data-section">
+                            <h3>Informações Pessoais</h3>
+                            <div class="data-grid">
+                                <div class="data-item">
+                                    <span class="data-label">Nome Completo:</span>
+                                    <span class="data-value">{{ aluno.nome_completo }}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Sexo:</span>
+                                    <span class="data-value">{{ aluno.get_sexo_display }}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Data de Nascimento:</span>
+                                    <span class="data-value">{{ aluno.data_nascimento|date:"d/m/Y" }}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Local de Nascimento:</span>
+                                    <span class="data-value">{{ aluno.local_nascimento }}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Província:</span>
+                                    <span class="data-value">{{ aluno.get_provincia_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="data-section">
+                            <h3>Documentação</h3>
+                            <div class="data-grid">
+                                <div class="data-item">
+                                    <span class="data-label">Tipo de Documento:</span>
+                                    <span class="data-value">{{ aluno.get_tipo_identificacao_display }}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Número:</span>
+                                    <span class="data-value">{{ aluno.numero_identificacao }}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Data de Emissão:</span>
+                                    <span class="data-value">{{ aluno.data_emissao_identificacao|date:"d/m/Y" }}</span>
+                                </div>
+                                <div class="data-item">
+                                    <span class="data-label">Emitido por:</span>
+                                    <span class="data-value">{{ aluno.emissor_identificacao }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="data-section">
+                            <h3>Informações Acadêmicas</h3>
+                            {% if matricula %}
+                                <div class="data-grid">
+                                    <div class="data-item">
+                                        <span class="data-label">Curso:</span>
+                                        <span class="data-value">{{ matricula.curso.nome }}</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span class="data-label">Número de Matrícula:</span>
+                                        <span class="data-value">{{ matricula.numero_matricula }}</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span class="data-label">Ano Letivo:</span>
+                                        <span class="data-value">{{ matricula.ano_letivo }}</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span class="data-label">Turno:</span>
+                                        <span class="data-value">{{ matricula.get_turno_display }}</span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class="text-muted">Nenhuma informação de matrícula disponível.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animação de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            // Suavizar transição de seções
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('href').startsWith('#')) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            window.scrollTo({
+                                top: target.offsetTop - 20,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // Ativar menu ativo baseado na rolagem
+            const sections = document.querySelectorAll('.content-section');
+            const navItems = document.querySelectorAll('.sidebar-nav li');
+            
+            window.addEventListener('scroll', function() {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (pageYOffset >= (sectionTop - 100)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    const link = item.querySelector('a');
+                    if (link.getAttribute('href') === `#${current}` || 
+                        (current === '' && link.getAttribute('href') === "{% url 'painel_aluno' %}")) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
