@@ -177,7 +177,7 @@ class Curso(models.Model):
     
     nome = models.CharField(max_length=100)
     codigo = models.CharField(max_length=20, unique=True)
-    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default='Curso Médio')
     area_formacao = models.ForeignKey(AreaFormacao, on_delete=models.PROTECT)
     duracao_anos = models.PositiveSmallIntegerField(default=4)
     identificador_matricula = models.CharField(
@@ -190,8 +190,15 @@ class Curso(models.Model):
         return f"{self.get_tipo_display()} de {self.nome}"
 
 class Disciplina(models.Model):
+    
+    CATEGORIA_CHOICES = (
+        ('COMPONENTE SOCIO-CULTURAL', 'Componente Socio-cultural'),
+        ('COMPONENTE CIENTIFICA', 'Componente Cientifica'),
+        ('COMPONENTE TECNOLOGICA E PRATICA', 'Componente Tecnologica e Pratica'),
+    )
     nome = models.CharField(max_length=100)
     codigo = models.CharField(max_length=20, unique=True)
+    categoria = models.CharField(max_length=100, choices=CATEGORIA_CHOICES)
     
     def __str__(self):
         return f"{self.codigo} - {self.nome}"

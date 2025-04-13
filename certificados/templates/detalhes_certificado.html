@@ -1,4 +1,465 @@
 {% load static %}
+<!----<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificado de Conclusão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="{% static 'img/ipiz.png' %}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #fff;
+            color: #000;
+        }
+
+        .certificate-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 15mm;
+            background-color: #fff;
+            border: 3px double #000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .certificate-container::after {
+            content: '';
+            position: absolute;
+            top: 5mm;
+            left: 5mm;
+            right: 5mm;
+            bottom: 5mm;
+            border: 1px dashed #000;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header img.logo {
+            width: 70px;
+            margin-bottom: 10px;
+        }
+
+        .header h3 {
+            margin: 5px 0;
+            font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #000;
+            letter-spacing: 1px;
+        }
+
+        .header h3:first-of-type {
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .title {
+            text-align: center;
+            margin: 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #000;
+        }
+
+        .title h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+            color: #000;
+        }
+
+        .title h3 {
+            margin: 8px 0 0 0;
+            font-size: 18px;
+            font-weight: 500;
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+            color: #000;
+        }
+
+        .content {
+            text-align: justify;
+            line-height: 1.6;
+            font-size: 13px;
+            color: #000;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content p {
+            margin-bottom: 15px;
+        }
+
+        .content strong {
+            font-weight: 500;
+        }
+
+        .table-section {
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+
+        .table-section h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: #000;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 3px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .table th {
+            background-color: #f0f0f0;
+            font-weight: 600;
+            padding: 6px 8px;
+            text-align: left;
+            border-bottom: 2px solid #000;
+            font-size: 12px;
+        }
+
+        .table td {
+            padding: 5px 8px;
+            border: 1px solid #000;
+            font-size: 12px;
+        }
+
+        .table tr:nth-child(even) td {
+            background-color: #f8f8f8;
+        }
+
+        .results {
+            margin: 20px 0;
+            font-size: 13px;
+            background-color: #f8f8f8;
+            padding: 12px;
+            border-left: 3px solid #000;
+        }
+
+        .results p {
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            font-size: 13px;
+            text-align: justify;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 3px;
+        }
+
+        .signatures-container {
+            margin-top: 40px;
+            margin-bottom: 60px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            page-break-inside: avoid;
+            position: relative;
+            z-index: 2;
+        }
+
+        .signature {
+            width: 45%;
+        }
+
+        .signature p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .signature p.title {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .signature p.subtitle {
+            font-size: 11px;
+        }
+
+        .date {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        .qr-code {
+            position: absolute;
+            bottom: 20mm;
+            right: 15mm;
+            text-align: center;
+            background: white;
+            padding: 5px;
+            border: 1px solid #000;
+            border-radius: 3px;
+            z-index: 1;
+        }
+
+        .qr-code img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .qr-code p {
+            font-size: 8px;
+            margin: 2px 0 0 0;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .action-buttons .btn {
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+
+        @media print {
+            body {
+                background-color: #fff !important;
+            }
+
+            .certificate-container {
+                border: 3px double #000 !important;
+                box-shadow: none !important;
+                padding: 15mm !important;
+                min-height: auto;
+                height: auto;
+            }
+
+            .certificate-container::after {
+                border: 1px dashed #000 !important;
+                opacity: 0.3 !important;
+            }
+
+            .action-buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="certificate-container">
+    <div class="header">
+        <img src="{% static 'img/insignia.png' %}" alt="ANGOLA" class="logo">
+        <h3 style="color: inherit;">REPÚBLICA DE ANGOLA</h3>
+        <h3>MINISTÉRIO DA EDUCAÇÃO</h3>
+        <h3>INSTITUTO POLITÉCNICO INDUSTRIAL Nº 6081 "17 DE DEZEMBRO"</h3>
+    </div> --->
+
+    <!-- Título do certificado 
+    <div class="title">
+        <h2>CERTIFICADO DE HABILITAÇÕES</h2>
+        <h3>Conclusão de Curso</h3>
+    </div>
+
+     Corpo do certificado 
+    <div class="content">
+        <p>
+            Certificamos que <strong>{{ certificado.matricula.aluno.nome_completo|upper }}</strong>, 
+            filho(a) de <strong>{{ certificado.matricula.aluno.nome_pai|upper }}</strong> e de 
+            <strong>{{ certificado.matricula.aluno.nome_mae|upper }}</strong>, natural de 
+            <strong>{{ certificado.matricula.aluno.local_nascimento|upper }}</strong>, Província do 
+            <strong>{{ certificado.matricula.aluno.get_provincia_display|upper }}</strong>, nascido(a) em 
+            <strong>{{ certificado.matricula.aluno.data_nascimento|date:"d/m/Y" }}</strong>, portador(a) do 
+            <strong>{{ certificado.matricula.aluno.get_tipo_identificacao_display|upper }} nº {{ certificado.matricula.aluno.numero_identificacao }}</strong>, 
+            emitido por <strong>{{ certificado.matricula.aluno.emissor_identificacao|upper }}</strong> em 
+            <strong>{{ certificado.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}</strong>, concluiu com êxito o curso de 
+            <strong>{{ certificado.matricula.curso.nome|upper }}</strong>, na área de 
+            <strong>{{ certificado.matricula.curso.area_formacao.nome|upper }}</strong>, no ano lectivo de 
+            <strong>{{ certificado.ano_letivo }}</strong>, conforme consta no Processo Individual nº 
+            <strong>{{ certificado.numero_processo }}</strong>.
+        </p>
+
+        Tabelas de disciplinas responsivas 
+        <div class="table-section">
+            <h4>Componente Sócio-cultural</h4>
+            {% if socio_cultural %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80%">Disciplina</th>
+                                <th style="width: 20%">Nota Numérica</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resultado in socio_cultural %}
+                            <tr>
+                                <td>{{ resultado.disciplina.nome }}</td>
+                                <td>{{ resultado.nota_numerica }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">Nenhuma disciplina nesta categoria.</p>
+            {% endif %}
+        </div>
+        
+        <div class="table-section">
+            <h4>Componente Científica</h4>
+            {% if cientifica %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80%">Disciplina</th>
+                                <th style="width: 20%">Nota Numérica</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resultado in cientifica %}
+                            <tr>
+                                <td>{{ resultado.disciplina.nome }}</td>
+                                <td>{{ resultado.nota_numerica }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">Nenhuma disciplina nesta categoria.</p>
+            {% endif %}
+        </div>
+        
+        <div class="table-section">
+            <h4>Componente Técnica, Tecnológica e Prática</h4>
+            {% if tecnica %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80%">Disciplina</th>
+                                <th style="width: 20%">Nota Numérica</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resultado in tecnica %}
+                            <tr>
+                                <td>{{ resultado.disciplina.nome }}</td>
+                                <td>{{ resultado.nota_numerica }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">Nenhuma disciplina nesta categoria.</p>
+            {% endif %}
+        </div>
+
+         Resultados finais 
+        <div class="results">
+            <p><strong>Classificação Final do Plano Curricular (PC):</strong> <span>{{ certificado.media_curricular }} ({{ certificado.media_curricular|floatformat:"0" }} Valores)</span></p>
+            <p><strong>Classificação da Prova de Aptidão Profissional (PAP):</strong> <span>{{ certificado.prova_aptidao_profissional }} ({{ certificado.prova_aptidao_profissional|floatformat:"0" }} Valores)</span></p>
+            <p><strong>Classificação Final do Curso:</strong> <span>{{ certificado.classificacao_final }} ({{ certificado.classificacao_final|floatformat:"0" }} Valores)</span></p>
+        </div>
+
+         Rodapé do certificado 
+        <div class="footer-text">
+            <p>
+                Para os devidos fins, emitimos o presente Certificado, que será válido em todo o território nacional, conforme disposto no Decreto nº 9004 de 3 de Dezembro de 2004, que aprova os Estatutos do Subsistema do Ensino Técnico Profissional.
+            </p>
+        </div>
+    </div>
+
+     Data e assinaturas 
+    <div class="date">
+        <p>Luanda, {{ certificado.data_emissao|date:"j \d\e F \d\e Y" }}</p>
+    </div>
+
+    <div class="signatures-container">
+        <div style="width: 45%; text-align: center;">
+            <div style="position: relative;">
+                <div class="signature">
+                    <p class="title">{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</p>
+                    <p class="subtitle">Directora do Instituto</p>
+                </div>
+                {% if certificado.diretor.assinatura %}
+                <img src="{{ certificado.diretor.assinatura.url }}" alt="Assinatura" style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 100px; height: 40px; object-fit: contain;">
+                {% endif %}
+            </div>
+        </div>
+        
+        <div style="width: 45%; text-align: center;">
+            <div style="position: relative;">
+                <div class="signature">
+                    <p class="title">Mendes Antônio Dini</p>
+                    <p class="subtitle">Subdirector Pedagógico</p>
+                </div>
+                {% if certificado.subdirector.assinatura %}
+                <img src="{{ certificado.subdirector.assinatura.url }}" alt="Assinatura" style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 100px; height: 40px; object-fit: contain;">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+     QR Code para verificação 
+    <div class="qr-code">
+        {% if certificado.codigo_qr %}
+        <img src="{{ certificado.codigo_qr.url }}" alt="QR Code de Verificação">
+        <p>Verificar autenticidade</p>
+        {% endif %}
+    </div>
+</div>
+
+ Botões de ação 
+<div class="action-buttons">
+    <a href="{% url 'descarregar_certificado' certificado.id %}" class="btn btn-primary">
+        <i class="fas fa-file-pdf"></i> Baixar Certificado
+    </a>
+    <a href="{% url 'painel_aluno' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+</div>
+</body>
+</html>--->
+
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -28,13 +489,26 @@
             margin: 0 auto;
             padding: 15mm;
             background-color: #fffef7;
-            border: 2px solid #1a3c34;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 3px double #000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
+            background-image: linear-gradient(to right, #e6d9a2 0%, #fffef7 10%, #fffef7 90%, #e6d9a2 100%);
         }
 
-        /* Watermark mais discreto */
+        .certificate-container::after {
+            content: '';
+            position: absolute;
+            top: 5mm;
+            left: 5mm;
+            right: 5mm;
+            bottom: 5mm;
+            border: 1px dashed #000;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
         .certificate-container::before {
             content: "";
             position: absolute;
@@ -81,7 +555,7 @@
             text-align: center;
             margin: 20px 0;
             padding-bottom: 10px;
-            border-bottom: 1px solid #b71c1c;
+            border-bottom: 1px solid #000;
         }
 
         .title h2 {
@@ -148,20 +622,27 @@
         }
 
         .table th {
-            background-color: #1a3c34;
-            color: white;
-            font-weight: 500;
+            background-color: #f8f9fa;
+            color: #000;
+            font-weight: 600;
             padding: 6px 8px;
             text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 12px;
         }
 
         .table td {
             padding: 5px 8px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #dee2e6;
+            font-size: 12px;
         }
 
         .table tr:nth-child(even) td {
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
+        }
+
+        .table tr:nth-child(odd) td {
+            background-color: #fff;
         }
 
         .results {
@@ -169,7 +650,7 @@
             font-size: 13px;
             background-color: #f8f8f8;
             padding: 12px;
-            border-left: 3px solid #b71c1c;
+            border-left: 3px solid #000;
         }
 
         .results p {
@@ -191,21 +672,19 @@
             border-radius: 3px;
         }
 
-        .signatures {
-            margin-top: 30px;
+        .signatures-container {
+            margin-top: 40px;
+            margin-bottom: 60px;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             text-align: center;
             page-break-inside: avoid;
+            position: relative;
+            z-index: 2;
         }
 
         .signature {
-            width: 200px;
-        }
-
-        .signature .line {
-            border-top: 1px solid #1a3c34;
-            margin: 15px 0 5px 0;
+            width: 45%;
         }
 
         .signature p {
@@ -216,6 +695,12 @@
         .signature p.title {
             font-weight: 600;
             color: #1a3c34;
+            font-size: 13px;
+        }
+
+        .signature p.subtitle {
+            font-size: 11px;
+            color: #555;
         }
 
         .date {
@@ -227,23 +712,24 @@
 
         .qr-code {
             position: absolute;
-            bottom: 15mm;
+            bottom: 20mm;
             right: 15mm;
             text-align: center;
             background: white;
             padding: 5px;
             border: 1px solid #e0e0e0;
             border-radius: 3px;
+            z-index: 1;
         }
 
         .qr-code img {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
         }
 
         .qr-code p {
-            font-size: 9px;
-            margin: 3px 0 0 0;
+            font-size: 8px;
+            margin: 2px 0 0 0;
             color: #555;
         }
 
@@ -267,11 +753,17 @@
             }
 
             .certificate-container {
-                border: none !important;
+                border: 3px double #000 !important;
                 box-shadow: none !important;
                 padding: 15mm !important;
                 min-height: auto;
                 height: auto;
+                background-image: none !important;
+            }
+
+            .certificate-container::after {
+                border: 1px dashed #000 !important;
+                opacity: 0.3 !important;
             }
 
             .action-buttons {
@@ -282,14 +774,15 @@
                 opacity: 0.1;
             }
         }
+
+        
     </style>
 </head>
 <body>
 <div class="certificate-container">
-    <!-- Cabeçalho institucional simplificado -->
     <div class="header">
-        <img src="{% static 'img/ipiz.png' %}" alt="Logo IPIZ" class="logo">
-        <h3>REPÚBLICA DE ANGOLA</h3>
+        <img src="{% static 'img/insignia.png' %}" alt="ANGOLA" class="logo">
+        <h3 style="color: inherit;">REPÚBLICA DE ANGOLA</h3>
         <h3>MINISTÉRIO DA EDUCAÇÃO</h3>
         <h3>INSTITUTO POLITÉCNICO INDUSTRIAL Nº 6081 "17 DE DEZEMBRO"</h3>
     </div>
@@ -321,74 +814,80 @@
         <!-- Tabelas de disciplinas responsivas -->
         <div class="table-section">
             <h4>Componente Sócio-cultural</h4>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th style="width: 70%">Disciplina</th>
-                            <th style="width: 15%">Nota Numérica</th>
-                            <th style="width: 15%">Nota Literal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for resultado in socio_cultural %}
-                        <tr>
-                            <td>{{ resultado.disciplina.nome }}</td>
-                            <td>{{ resultado.nota_numerica }}</td>
-                            <td>{{ resultado.nota_literal }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% if socio_cultural %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80%">Disciplina</th>
+                                <th style="width: 20%">Nota Numérica</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resultado in socio_cultural %}
+                            <tr>
+                                <td>{{ resultado.disciplina.nome }}</td>
+                                <td>{{ resultado.nota_numerica }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">Nenhuma disciplina nesta categoria.</p>
+            {% endif %}
         </div>
-
+        
         <div class="table-section">
             <h4>Componente Científica</h4>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th style="width: 70%">Disciplina</th>
-                            <th style="width: 15%">Nota Numérica</th>
-                            <th style="width: 15%">Nota Literal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for resultado in cientifica %}
-                        <tr>
-                            <td>{{ resultado.disciplina.nome }}</td>
-                            <td>{{ resultado.nota_numerica }}</td>
-                            <td>{{ resultado.nota_literal }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% if cientifica %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80%">Disciplina</th>
+                                <th style="width: 20%">Nota Numérica</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resultado in cientifica %}
+                            <tr>
+                                <td>{{ resultado.disciplina.nome }}</td>
+                                <td>{{ resultado.nota_numerica }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">Nenhuma disciplina nesta categoria.</p>
+            {% endif %}
         </div>
-
+        
         <div class="table-section">
             <h4>Componente Técnica, Tecnológica e Prática</h4>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th style="width: 70%">Disciplina</th>
-                            <th style="width: 15%">Nota Numérica</th>
-                            <th style="width: 15%">Nota Literal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for resultado in tecnica %}
-                        <tr>
-                            <td>{{ resultado.disciplina.nome }}</td>
-                            <td>{{ resultado.nota_numerica }}</td>
-                            <td>{{ resultado.nota_literal }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% if tecnica %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80%">Disciplina</th>
+                                <th style="width: 20%">Nota Numérica</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resultado in tecnica %}
+                            <tr>
+                                <td>{{ resultado.disciplina.nome }}</td>
+                                <td>{{ resultado.nota_numerica }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">Nenhuma disciplina nesta categoria.</p>
+            {% endif %}
         </div>
 
         <!-- Resultados finais -->
@@ -411,24 +910,37 @@
         <p>Luanda, {{ certificado.data_emissao|date:"j \d\e F \d\e Y" }}</p>
     </div>
 
-    <div class="signatures">
-        <div class="signature">
-            <div class="line"></div>
-            <p>{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</p>
-            <p class="title">{{ certificado.cargo_diretor }}</p>
+    <div class="signatures-container">
+        <div style="width: 45%; text-align: center;">
+            <div style="position: relative;">
+                <div class="signature">
+                    <p class="title">{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</p>
+                    <p class="subtitle">Directora do Instituto</p>
+                </div>
+                {% if certificado.diretor.assinatura %}
+                <img src="{{ certificado.diretor.assinatura.url }}" alt="Assinatura" style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 100px; height: 40px; object-fit: contain;">
+                {% endif %}
+            </div>
         </div>
-        <div class="signature">
-            <div class="line"></div>
-            <p>Mendes Antônio Dini</p>
-            <p class="title">Subdirector Pedagógico</p>
+        
+        <div style="width: 45%; text-align: center;">
+            <div style="position: relative;">
+                <div class="signature">
+                    <p class="title">Mendes Antônio Dini</p>
+                    <p class="subtitle">Subdirector Pedagógico</p>
+                </div>
+                {% if certificado.subdirector.assinatura %}
+                <img src="{{ certificado.subdirector.assinatura.url }}" alt="Assinatura" style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 100px; height: 40px; object-fit: contain;">
+                {% endif %}
+            </div>
         </div>
     </div>
 
     <!-- QR Code para verificação -->
     <div class="qr-code">
         {% if certificado.codigo_qr %}
-            <img src="{{ certificado.codigo_qr.url }}" alt="QR Code de Verificação">
-            <p>Verificar autenticidade</p>
+        <img src="{{ certificado.codigo_qr.url }}" alt="QR Code de Verificação">
+        <p>Verificar autenticidade</p>
         {% endif %}
     </div>
 </div>

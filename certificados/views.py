@@ -138,13 +138,21 @@ def visualizar_certificado(request, certificado_id):
             messages.error(request, "Você não tem permissão para acessar este certificado.")
             return redirect('painel_aluno')
         
-        # Organiza as disciplinas por componentes
-        disciplinas = certificado.resultados_disciplinas.all().order_by('disciplina__nome')
+        # Organiza as disciplinas por componentes usando a categoria do modelo
+        resultados = certificado.resultados_disciplinas.all().select_related('disciplina')
         
-        # Separa as disciplinas por componentes (sócio-cultural, científica, técnica)
-        socio_cultural = disciplinas[:4]  # Primeiras 4 disciplinas
-        cientifica = disciplinas[4:9]    # Próximas 5 disciplinas
-        tecnica = disciplinas[9:]        # Restantes
+        # Filtra as disciplinas por categoria
+        socio_cultural = resultados.filter(
+            disciplina__categoria='COMPONENTE SOCIO-CULTURAL'
+        ).order_by('disciplina__nome')
+        
+        cientifica = resultados.filter(
+            disciplina__categoria='COMPONENTE CIENTIFICA'
+        ).order_by('disciplina__nome')
+        
+        tecnica = resultados.filter(
+            disciplina__categoria='COMPONENTE TECNOLOGICA E PRATICA'
+        ).order_by('disciplina__nome')
         
         context = {
             'certificado': certificado,
@@ -179,11 +187,21 @@ def descarregar_certificado(request, certificado_id):
             messages.error(request, "Você não tem permissão para baixar este certificado.")
             return redirect('painel_aluno')
         
-        # Organiza as disciplinas para o PDF
-        disciplinas = certificado.resultados_disciplinas.all().order_by('disciplina__nome')
-        socio_cultural = disciplinas[:4]
-        cientifica = disciplinas[4:9]
-        tecnica = disciplinas[9:]
+        # Organiza as disciplinas por componentes
+        resultados = certificado.resultados_disciplinas.all().select_related('disciplina')
+        
+        # Filtra as disciplinas por categoria
+        socio_cultural = resultados.filter(
+            disciplina__categoria='COMPONENTE SOCIO-CULTURAL'
+        ).order_by('disciplina__nome')
+        
+        cientifica = resultados.filter(
+            disciplina__categoria='COMPONENTE CIENTIFICA'
+        ).order_by('disciplina__nome')
+        
+        tecnica = resultados.filter(
+            disciplina__categoria='COMPONENTE TECNOLOGICA E PRATICA'
+        ).order_by('disciplina__nome')
         
         context = {
             'certificado': certificado,
@@ -215,7 +233,6 @@ def descarregar_certificado(request, certificado_id):
     except Certificado.DoesNotExist:
         messages.error(request, "Certificado não encontrado.")
         return redirect('painel_aluno')
-
 
 def verificar_certificado(request, identificador):
     """

@@ -46,8 +46,8 @@ class AreaFormacaoAdmin(admin.ModelAdmin):
     search_fields = ('nome', 'codigo')
 
 class DisciplinaAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'codigo')
-    search_fields = ('nome', 'codigo')
+    list_display = ('nome', 'codigo', 'categoria')
+    search_fields = ('nome', 'codigo', 'categoria')
     list_filter = ('codigo',)
 
 class CursoDisciplinaInline(admin.TabularInline):
