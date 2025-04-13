@@ -84,7 +84,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 d-none d-lg-block animate__animated animate__fadeInRight">
-                    <img src="{% static 'img/ipi.png' %}" alt="Certificado Digital" class="img-fluid hero-illustration">
+                    <img src="{% static 'img/ipi.png' %}" alt="" class="img-fluid hero-illustration">
                 </div>
             </div>
         </div>
@@ -96,45 +96,49 @@
     </section>
 
     <!-- News Slider -->
-    <section class="py-5 bg-white">
-        <div class="container">
-            <div class="news-slider swiper">
-                <div class="swiper-wrapper">
-                    <!-- Slide 1 -->
-                    <div class="swiper-slide">
-                        <div class="slide-content" style="background: url('{% static 'img/slide1.jpg' %}') center/cover;">
-                            <div>
-                                <h2 class="fw-bold mb-3">Novo Sistema de Certificação</h2>
-                                <p class="lead mb-4">IPIC lança plataforma digital para emissão de certificados com tecnologia blockchain</p>
-                                <a href="#" class="btn btn-accent">Saiba Mais</a>
+        <!-- News Slider -->
+        <section class="py-5 bg-white">
+            <div class="container">
+                <div class="news-slider swiper">
+                    <div class="swiper-wrapper">
+                        <!-- Slide 1 -->
+                        <div class="swiper-slide">
+                            <div class="slide-content" style="background: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b') center/cover;">
+                                <div>
+                                    <h2 class="fw-bold mb-3">Novo Sistema de Certificação</h2>
+                                    <p class="lead mb-4">IPIC lança plataforma digital para emissão de certificados com tecnologia blockchain</p>
+                                    <a href="#" class="btn btn-accent">Saiba Mais</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 2 (Atualizado) -->
+                        <div class="swiper-slide">
+                            <div class="slide-content" style="background: url('https://images.pexels.com/photos/8294626/pexels-photo-8294626.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260') center/cover;">
+                                <div>
+                                    <h2 class="fw-bold mb-3">Validação Instantânea</h2>
+                                    <p class="lead mb-4">Empresas podem verificar a autenticidade dos certificados em segundos</p>
+                                    <a href="#verification" class="btn btn-accent">Como Verificar</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="swiper-slide">
+                            <div class="slide-content" style="background: url('https://images.unsplash.com/photo-1596495577886-d920f1fb7238') center/cover;">
+                                <div>
+                                    <h2 class="fw-bold mb-3">Workshops Setoriais</h2>
+                                    <p class="lead mb-4">Capacitação para diferentes áreas profissionais com certificação digital</p>
+                                    <a href="#" class="btn btn-accent">Ver Calendário</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Slide 2 -->
-                    <div class="swiper-slide">
-                        <div class="slide-content" style="background: url('{% static 'img/slide2.jpg' %}') center/cover;">
-                            <div>
-                                <h2 class="fw-bold mb-3">Validação Instantânea</h2>
-                                <p class="lead mb-4">Empresas podem verificar a autenticidade dos certificados em segundos</p>
-                                <a href="#verification" class="btn btn-accent">Como Verificar</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 3 -->
-                    <div class="swiper-slide">
-                        <div class="slide-content" style="background: url('{% static 'img/slide3.jpg' %}') center/cover;">
-                            <div>
-                                <h2 class="fw-bold mb-3">Workshops Setoriais</h2>
-                                <p class="lead mb-4">Capacitação para diferentes áreas profissionais com certificação digital</p>
-                                <a href="#" class="btn btn-accent">Ver Calendário</a>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="swiper-pagination"></div>
                 </div>
-                <div class="swiper-pagination"></div>
             </div>
-        </div>
-    </section>
+        </section>
+
+
+
 
     <!-- Stats Section -->
     <section class="py-5 bg-light">
@@ -253,13 +257,13 @@
             </div>
             
             <div class="row g-4">
-                <!-- Design e Artes -->
+                <!-- Frio e Climatização (Atualizado) -->
                 <div class="col-md-4">
                     <div class="sector-card">
-                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Design e Artes">
+                        <img src="{% static 'img/frio.jpg' %}" class="img-fluid" alt="Frio e Climatização">
                         <div class="sector-overlay">
-                            <h4 class="mb-1">Design e Artes</h4>
-                            <p class="small mb-0">Design Gráfico, Design de Produto, Artes Visuais</p>
+                            <h4 class="mb-1">Frio e Climatização</h4>
+                            <p class="small mb-0">Refrigeração, Climatização, Instalação e Manutenção</p>
                         </div>
                     </div>
                 </div>
@@ -297,10 +301,10 @@
                     </div>
                 </div>
                 
-                <!-- Mecânica - NOVA IMAGEM ADICIONADA -->
+                <!-- Mecânica -->
                 <div class="col-md-4">
                     <div class="sector-card">
-                        <img src="https://images.unsplash.com/photo-1581094271901-8022df4466f9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Mecânica">
+                        <img src="{% static 'img/meca.jpg' %}" class="img-fluid" alt="Mecânica">
                         <div class="sector-overlay">
                             <h4 class="mb-1">Mecânica</h4>
                             <p class="small mb-0">Mecânica Industrial, Automóvel, Máquinas e Ferramentas</p>
@@ -308,10 +312,10 @@
                     </div>
                 </div>
                 
-                <!-- Mecatrônica -->
+                <!-- Mecatrônica (Mantida) -->
                 <div class="col-md-4">
                     <div class="sector-card">
-                        <img src="https://images.unsplash.com/photo-1597852074816-d933c7d2b988?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Mecatrônica">
+                        <img src="https://images.unsplash.com/photo-1540829917886-91ab031b1764?auto=format&fit=crop&w=800&q=80" class="img-fluid" alt="Mecatrônica">
                         <div class="sector-overlay">
                             <h4 class="mb-1">Mecatrônica</h4>
                             <p class="small mb-0">Robótica, Automação Industrial, Controle de Processos</p>
@@ -327,7 +331,7 @@
             </div>
         </div>
     </section>
-
+    
     <!-- Verification Section -->
     <section id="verification" class="py-5 bg-white">
         <div class="container">
@@ -434,7 +438,7 @@
                     <div class="swiper-slide">
                         <div class="testimonial-card">
                             <div class="d-flex align-items-center mb-4">
-                                <img src="{% static 'img/testimonial1.jpg' %}" class="testimonial-img me-3" alt="Depoimento">
+                                <img src="{% static 'img/depoimento/nelson.png' %}" class="testimonial-img me-3" alt="Depoimento">
                                 <div>
                                     <h5 class="mb-1">Nelson Muquissi</h5>
                                     <small class="text-muted">Estudante Informática</small>
@@ -474,7 +478,7 @@
                     <div class="swiper-slide">
                         <div class="testimonial-card">
                             <div class="d-flex align-items-center mb-4">
-                                <img src="{% static 'img/testimonial3.jpg' %}" class="testimonial-img me-3" alt="Depoimento">
+                                <img src="{% static 'img/t.jpg' %}" class="testimonial-img me-3" alt="Depoimento">
                                 <div>
                                     <h5 class="mb-1">Pedro Bundi</h5>
                                     <small class="text-muted">Estudante Informática</small>
@@ -487,14 +491,14 @@
                                 <i class="fas fa-star"></i>
                                 <i class="fas fa-star-half-alt"></i>
                             </div>
-                            <p class="mb-0">"A verificação rápida dos certificados economiza tempo no nosso processo seletivo. Sabemos que os documentos são autênticos, o que traz segurança para nossa empresa."</p>
+                            <p class="mb-0">"A verificação rápida dos certificados economiza tempo no processo seletivo. Sabemos que os documentos são autênticos, o que traz segurança para empresas."</p>
                         </div>
                     </div>
                     <!-- Testimonial 4 -->
                     <div class="swiper-slide">
                         <div class="testimonial-card">
                             <div class="d-flex align-items-center mb-4">
-                                <img src="{% static 'img/testimonial4.jpg' %}" class="testimonial-img me-3" alt="Depoimento">
+                                <img src="{% static 'img/.jpg' %}" class="testimonial-img me-3" alt="Depoimento">
                                 <div>
                                     <h5 class="mb-1">Joana Francisco</h5>
                                     <small class="text-muted">Directora Geral</small>
@@ -522,7 +526,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-4 mb-lg-0">
                     <h2 class="fw-bold mb-4">Sobre o IPIC</h2>
-                    <p class="lead">O Instituto Politécnico Industrial de Luanda é referência em educação profissional em Angola.</p>
+                    <p class="lead">O Instituto Politécnico Industrial do Calumbo é referência em educação profissional em Angola.</p>
                     <p>Com mais de 20 anos de experiência, oferecemos cursos técnicos e profissionalizantes em diversas áreas, formando profissionais qualificados para o mercado de trabalho.</p>
                     <p>Nosso sistema de certificados digitais foi desenvolvido para garantir a autenticidade e facilitar a verificação das qualificações dos nossos alunos.</p>
                     <div class="mt-4">
@@ -532,7 +536,7 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="ratio ratio-16x9">
-                        <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Sobre o IPIZ" allowfullscreen class="rounded-3 shadow"></iframe>
+                        <iframe src="https://www.youtube.com/watch?v=2ZIbhD-_XgI" title="Sobre o IPIZ" allowfullscreen class="rounded-3 shadow"></iframe>
                     </div>
                 </div>
             </div>
