@@ -120,6 +120,10 @@ def logout_aluno(request):
     return redirect('home')
 
 
+
+def visualizar_certificado(request, certificado_id):
+    pass
+
 @login_required
 def descarregar_certificado(request, certificado_id):
     certificado = get_object_or_404(Certificado, id=certificado_id, ativo=True)
