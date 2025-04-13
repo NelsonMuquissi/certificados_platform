@@ -73,58 +73,52 @@ def painel_aluno(request):
         return redirect('login')
 
 def solicitar_correcao(request):
+    # Verifica se o aluno está logado
     if 'aluno_id' not in request.session:
         messages.error(request, "Por favor, faça login para acessar esta página.")
-        return redirect('login')
+        return redirect('login_aluno')
     
     if request.method == 'POST':
         certificado_id = request.POST.get('certificado_id')
         descricao = request.POST.get('descricao')
         
         try:
-            certificado = Certificado.objects.get(id=certificado_id, matricula__aluno__id=request.session['aluno_id'])
+            # Obtém o aluno da sessão
+            aluno = Aluno.objects.get(id=request.session['aluno_id'])
             
+            # Verifica se o certificado pertence ao aluno
+            certificado = Certificado.objects.get(
+                id=certificado_id, 
+                matricula__aluno=aluno
+            )
+            
+            # Cria o pedido de correção (agora usando o Aluno diretamente)
             PedidoCorrecao.objects.create(
                 certificado=certificado,
                 descricao=descricao,
-                estado='PENDENTE'
+                estado='PENDENTE',
+                solicitado_por=aluno  # Agora aceita o Aluno diretamente
             )
             
             messages.success(request, "Solicitação de correção enviada com sucesso!")
             return redirect('painel_aluno')
             
         except Certificado.DoesNotExist:
-            messages.error(request, "Certificado não encontrado.")
-            return redirect('painel_aluno')
+            messages.error(request, "Certificado não encontrado ou não pertence a você.")
+        except Aluno.DoesNotExist:
+            messages.error(request, "Aluno não encontrado.")
+            return redirect('login_aluno')
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro: {str(e)}")
+        
+        return redirect('painel_aluno')
     
     return redirect('painel_aluno')
 
 def logout_aluno(request):
-        request.session.flush()  # Remove todas as informações da sessão
-        return redirect('login_aluno')
+    request.session.flush()
+    return redirect('home')
 
-@login_required
-def painel_controle(request):
-    # Painéis diferentes conforme o papel do usuário
-    if request.user.papel == 'ESTUDANTE':
-        certificados = Certificado.objects.filter(estudante=request.user, ativo=True)
-        notificacoes = Notificacao.objects.filter(usuario=request.user, lida=False)
-        return render(request, 'painel_estudante.html', {
-            'certificados': certificados,
-            'notificacoes': notificacoes
-        })
-    elif request.user.papel == 'SECRETARIA':
-        # Painel da secretaria
-        pass
-    # Outros papéis...
-
-@login_required
-def visualizar_certificado(request, certificado_id):
-    certificado = get_object_or_404(Certificado, id=certificado_id, ativo=True)
-    if request.user.papel == 'ESTUDANTE' and certificado.estudante != request.user:
-        return HttpResponse("Não autorizado", status=401)
-    
-    return render(request, 'detalhes_certificado.html', {'certificado': certificado})
 
 @login_required
 def descarregar_certificado(request, certificado_id):
@@ -147,9 +141,6 @@ def descarregar_certificado(request, certificado_id):
     
     return HttpResponse("Erro ao gerar PDF", status=500)
 
-"""def verificar_certificado(request, codigo_verificacao):
-    certificado = get_object_or_404(Certificado, codigo_verificacao=codigo_verificacao, ativo=True)
-    return render(request, 'verificacao_certificado.html', {'certificado': certificado})"""
 
 def verificar_certificado(request, identificador):
     """

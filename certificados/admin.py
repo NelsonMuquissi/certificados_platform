@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.db import IntegrityError
+from django.utils  import timezone
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     Usuario, Aluno, AreaFormacao, Curso, Disciplina, 

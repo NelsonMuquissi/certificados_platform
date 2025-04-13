@@ -219,7 +219,7 @@ class Matricula(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.PROTECT)
     numero_matricula = models.CharField(max_length=20, unique=True, editable=False)
     data_matricula = models.DateField()
-    ano_letivo = models.CharField(max_length=9)
+    ano_letivo = models.CharField(max_length=9, default='2024-2025')
     nivel_classe = models.CharField(max_length=20, default='13')
     turno = models.CharField(max_length=10, choices=TURNO_CHOICES)
     ativo = models.BooleanField(default=True)
@@ -432,7 +432,7 @@ class PedidoCorrecao(models.Model):
     )
     
     certificado = models.ForeignKey(Certificado, on_delete=models.CASCADE, related_name='pedidos_correcao')
-    solicitado_por = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    solicitado_por = models.ForeignKey(Aluno, on_delete=models.CASCADE)
     data_solicitacao = models.DateTimeField(auto_now_add=True)
     descricao = models.TextField()
     estado = models.CharField(max_length=10, choices=ESTADOS, default='PENDENTE')
