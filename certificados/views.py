@@ -14,6 +14,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.utils.timezone import now
 from django.contrib.auth.hashers import check_password
+from io import BytesIO
 
 
 def home(request):
@@ -121,29 +122,99 @@ def logout_aluno(request):
 
 
 
+ 
 def visualizar_certificado(request, certificado_id):
-    pass
+    # Verifica se o aluno está logado na sessão
+    if 'aluno_id' not in request.session:
+        messages.error(request, "Por favor, faça login para acessar esta página.")
+        return redirect('login_aluno')
+    
+    try:
+        aluno = Aluno.objects.get(id=request.session['aluno_id'])
+        certificado = get_object_or_404(Certificado, id=certificado_id, ativo=True)
+        
+        # Verifica se o certificado pertence ao aluno logado
+        if certificado.matricula.aluno != aluno:
+            messages.error(request, "Você não tem permissão para acessar este certificado.")
+            return redirect('painel_aluno')
+        
+        # Organiza as disciplinas por componentes
+        disciplinas = certificado.resultados_disciplinas.all().order_by('disciplina__nome')
+        
+        # Separa as disciplinas por componentes (sócio-cultural, científica, técnica)
+        socio_cultural = disciplinas[:4]  # Primeiras 4 disciplinas
+        cientifica = disciplinas[4:9]    # Próximas 5 disciplinas
+        tecnica = disciplinas[9:]        # Restantes
+        
+        context = {
+            'certificado': certificado,
+            'aluno': aluno,
+            'socio_cultural': socio_cultural,
+            'cientifica': cientifica,
+            'tecnica': tecnica,
+        }
+        
+        return render(request, 'detalhes_certificado.html', context)
+        
+    except Aluno.DoesNotExist:
+        messages.error(request, "Aluno não encontrado.")
+        return redirect('login_aluno')
+    except Certificado.DoesNotExist:
+        messages.error(request, "Certificado não encontrado.")
+        return redirect('painel_aluno')
 
-@login_required
+
 def descarregar_certificado(request, certificado_id):
-    certificado = get_object_or_404(Certificado, id=certificado_id, ativo=True)
-    if request.user.papel == 'ESTUDANTE' and certificado.estudante != request.user:
-        return HttpResponse("Não autorizado", status=401)
+    # Verifica se o aluno está logado na sessão
+    if 'aluno_id' not in request.session:
+        messages.error(request, "Por favor, faça login para acessar esta página.")
+        return redirect('login_aluno')
     
-    # Gerar PDF
-    template = get_template('certificado_pdf.html')
-    html = template.render({'certificado': certificado})
-    
-    resultado = io.BytesIO()
-    pdf = pisa.pisaDocument(io.BytesIO(html.encode("UTF-8")), resultado)
-    
-    if not pdf.err:
-        response = HttpResponse(resultado.getvalue(), content_type='application/pdf')
-        nome_arquivo = f"certificado_{certificado.numero_certificado}.pdf"
-        response['Content-Disposition'] = f'attachment; filename="{nome_arquivo}"'
-        return response
-    
-    return HttpResponse("Erro ao gerar PDF", status=500)
+    try:
+        aluno = Aluno.objects.get(id=request.session['aluno_id'])
+        certificado = get_object_or_404(Certificado, id=certificado_id, ativo=True)
+        
+        # Verifica se o certificado pertence ao aluno logado
+        if certificado.matricula.aluno != aluno:
+            messages.error(request, "Você não tem permissão para baixar este certificado.")
+            return redirect('painel_aluno')
+        
+        # Organiza as disciplinas para o PDF
+        disciplinas = certificado.resultados_disciplinas.all().order_by('disciplina__nome')
+        socio_cultural = disciplinas[:4]
+        cientifica = disciplinas[4:9]
+        tecnica = disciplinas[9:]
+        
+        context = {
+            'certificado': certificado,
+            'aluno': aluno,
+            'socio_cultural': socio_cultural,
+            'cientifica': cientifica,
+            'tecnica': tecnica,
+        }
+        
+        # Renderiza o template para PDF
+        template = get_template('detalhes_certificado.html')
+        html = template.render(context)
+        
+        # Cria o PDF
+        result = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+        
+        if not pdf.err:
+            response = HttpResponse(result.getvalue(), content_type='application/pdf')
+            filename = f"certificado_{certificado.numero_certificado}.pdf"
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+        
+        return HttpResponse("Erro ao gerar PDF", status=500)
+        
+    except Aluno.DoesNotExist:
+        messages.error(request, "Aluno não encontrado.")
+        return redirect('login_aluno')
+    except Certificado.DoesNotExist:
+        messages.error(request, "Certificado não encontrado.")
+        return redirect('painel_aluno')
 
 
 def verificar_certificado(request, identificador):
