@@ -748,30 +748,26 @@
         }
 
         @media print {
-            body {
-                background-color: #fff !important;
+            body * {
+                visibility: hidden;
             }
-
+            .certificate-container, .certificate-container * {
+                visibility: visible;
+            }
             .certificate-container {
-                border: 3px double #000 !important;
-                box-shadow: none !important;
-                padding: 15mm !important;
-                min-height: auto;
-                height: auto;
-                background-image: none !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 15mm;
+                border: none;
+                box-shadow: none;
+                background-image: none;
             }
-
-            .certificate-container::after {
-                border: 1px dashed #000 !important;
-                opacity: 0.3 !important;
-            }
-
             .action-buttons {
-                display: none;
-            }
-
-            .certificate-container::before {
-                opacity: 0.1;
+                display: none !important;
             }
         }
 
@@ -796,19 +792,25 @@
     <!-- Corpo do certificado -->
     <div class="content">
         <p>
-            Certificamos que <strong>{{ certificado.matricula.aluno.nome_completo|upper }}</strong>, 
-            filho(a) de <strong>{{ certificado.matricula.aluno.nome_pai|upper }}</strong> e de 
-            <strong>{{ certificado.matricula.aluno.nome_mae|upper }}</strong>, natural de 
-            <strong>{{ certificado.matricula.aluno.local_nascimento|upper }}</strong>, Província do 
-            <strong>{{ certificado.matricula.aluno.get_provincia_display|upper }}</strong>, nascido(a) em 
-            <strong>{{ certificado.matricula.aluno.data_nascimento|date:"d/m/Y" }}</strong>, portador(a) do 
-            <strong>{{ certificado.matricula.aluno.get_tipo_identificacao_display|upper }} nº {{ certificado.matricula.aluno.numero_identificacao }}</strong>, 
-            emitido por <strong>{{ certificado.matricula.aluno.emissor_identificacao|upper }}</strong> em 
-            <strong>{{ certificado.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}</strong>, concluiu com êxito o curso de 
-            <strong>{{ certificado.matricula.curso.nome|upper }}</strong>, na área de 
-            <strong>{{ certificado.matricula.curso.area_formacao.nome|upper }}</strong>, no ano lectivo de 
-            <strong>{{ certificado.ano_letivo }}</strong>, conforme consta no Processo Individual nº 
-            <strong>{{ certificado.numero_processo }}</strong>.
+            <p>
+                A {{ certificado.cargo_diretor }}, <strong>{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</strong> 
+                e o Subdirector Pedagógico <strong>Mendes Antônio Dini</strong>, certificam de acordo com o artº 25º e 27º dos Estatutos do Subsistema 
+                do Ensino Técnico Profissional, aprovado pelo Decreto nº 9004 de 3 de Dezembro de 2004, que 
+                <strong>{{ certificado.matricula.aluno.nome_completo|upper }}</strong>, filho de 
+                <strong>{{ certificado.matricula.aluno.nome_pai|upper }}</strong> e de 
+                <strong>{{ certificado.matricula.aluno.nome_mae|upper }}</strong>, natural de 
+                <strong>{{ certificado.matricula.aluno.local_nascimento|upper }}</strong>, Província 
+                <strong>{{ certificado.matricula.aluno.get_provincia_display|upper }}</strong>, nascido aos 
+                <strong>{{ certificado.matricula.aluno.data_nascimento|date:"d/m/Y" }}</strong>, portador do 
+                <strong>{{ certificado.matricula.aluno.get_tipo_identificacao_display }} nº {{ certificado.matricula.aluno.numero_identificacao }}</strong>, 
+                passado pelo <strong>{{ certificado.matricula.aluno.emissor_identificacao|upper }}</strong> aos 
+                <strong>{{ certificado.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}</strong>, 
+                <strong>CONCLUIU</strong> em regime <strong>{{ certificado.matricula.get_turno_display|upper }}</strong>, no ano lectivo de 
+                <strong>{{ certificado.ano_letivo }}</strong> o curso de 
+                <strong>{{ certificado.matricula.curso.nome|upper }}</strong> na área de Formação de 
+                <strong>{{ certificado.matricula.curso.area_formacao.nome|upper }}</strong>, tendo obtido as seguintes 
+                classificações, conforme consta no processo individual nº <strong>{{ certificado.numero_processo }}</strong> e da folha nº 
+                <strong>010</strong> do Livro de Termos:
         </p>
 
         <!-- Tabelas de disciplinas responsivas -->
@@ -945,14 +947,24 @@
     </div>
 </div>
 
-<!-- Botões de ação -->
 <div class="action-buttons">
-    <a href="{% url 'descarregar_certificado' certificado.id %}" class="btn btn-primary">
+    <button onclick="window.print()" class="btn btn-primary">
         <i class="fas fa-file-pdf"></i> Baixar Certificado
-    </a>
+    </button>
     <a href="{% url 'painel_aluno' %}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Voltar
     </a>
 </div>
+
+<script>
+    // Configurações adicionais para impressão
+    document.addEventListener('DOMContentLoaded', function() {
+        // Adiciona um event listener para depois que a impressão terminar
+        window.addEventListener('afterprint', function() {
+            // Pode adicionar alguma lógica aqui se necessário
+            console.log('Impressão concluída ou cancelada');
+        });
+    });
+</script>
 </body>
 </html>
