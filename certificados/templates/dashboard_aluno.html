@@ -221,13 +221,17 @@
                                 <div class="verification-method">
                                     <h4><i class="fas fa-id-card"></i> Número de Matrícula</h4>
                                     <p>Digite seu número de matrícula para verificação:</p>
-                                    <form method="get" action="{% url 'verificar_certificado' certificado.numero_processo %}">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" name="matricula" placeholder="Número de Matrícula" 
-                                                   value="{% if matricula %}{{ matricula.numero_matricula }}{% endif %}">
-                                            <button class="btn btn-primary" type="submit">Verificar</button>
-                                        </div>
-                                    </form>
+                                    {% if certificado %}
+                                        <form method="get" action="{% url 'verificar_certificado' certificado.numero_processo %}">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" name="matricula" placeholder="Número de Matrícula" 
+                                                    value="{% if matricula %}{{ matricula.numero_matricula }}{% endif %}">
+                                                <button class="btn btn-primary" type="submit">Verificar</button>
+                                            </div>
+                                        </form>
+                                    {% else %}
+                                        <p>Nenhum certificado disponível para verificação.</p>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
