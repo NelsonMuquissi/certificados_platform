@@ -11,6 +11,7 @@ from django.db.models import Avg
 from django.utils.text import slugify
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
+from datetime import date
 
 
 PROVINCIAS_ANGOLA = (
@@ -95,6 +96,10 @@ class Usuario(AbstractUser):
     def has_perm(self, perm, obj=None):
         return self.is_staff or self.papel in ['ADMIN', 'SECRETARIA', 'DIRECAO']
 
+from datetime import date
+from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import make_password
+
 class Aluno(models.Model):
     SEXO_CHOICES = (
         ('M', 'Masculino'),
@@ -120,7 +125,7 @@ class Aluno(models.Model):
         default='BI'
     )
     data_emissao_identificacao = models.DateField()
-    emissor_identificacao = models.CharField(max_length=100)
+    emissor_identificacao = models.CharField(max_length=100, default="Direção Nacional de Identificação")
     foto = models.ImageField(upload_to='alunos/fotos/', null=True, blank=True)
     email = models.EmailField(unique=True, null=True, blank=True)
     senha = models.CharField(max_length=128, blank=True)
@@ -136,6 +141,7 @@ class Aluno(models.Model):
     
     def clean(self):
         super().clean()
+        
         # Validação do número de identificação
         if self.tipo_identificacao == 'BI':
             if len(self.numero_identificacao) != 14:
@@ -146,6 +152,21 @@ class Aluno(models.Model):
             if len(self.numero_identificacao) != 8:
                 raise ValidationError(
                     {'numero_identificacao': 'O Passaporte deve ter exatamente 8 caracteres (ex: Nxxxxxxx)'}
+                )
+        
+        # Validação de idade mínima (15 anos)
+        if self.data_nascimento:
+            hoje = date.today()
+            idade = hoje.year - self.data_nascimento.year - ((hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day))
+            
+            if idade < 15:
+                raise ValidationError(
+                    {'data_nascimento': 'O aluno deve ter pelo menos 15 anos completos.'}
+                )
+            # Verifica se a data de nascimento não é no futuro
+            if self.data_nascimento > hoje:
+                raise ValidationError(
+                    {'data_nascimento': 'A data de nascimento não pode ser no futuro.'}
                 )
     
     def save(self, *args, **kwargs):
@@ -159,6 +180,7 @@ class Aluno(models.Model):
         if self.email:
             self.email = self.email.lower()
         
+        # Força a validação antes de salvar
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -257,9 +279,9 @@ class Matricula(models.Model):
         super().save(*args, **kwargs)
 
 class Certificado(models.Model):
-    matricula = models.ForeignKey('Matricula', on_delete=models.PROTECT, related_name='certificados', unique=True)
+    matricula = models.OneToOneField('Matricula', on_delete=models.PROTECT, related_name='certificado')
     numero_certificado = models.CharField(max_length=20, unique=True, editable=False)
-    numero_processo = models.CharField(max_length=20, unique=True ,editable=False)
+    numero_processo = models.CharField(max_length=20, unique=True, editable=False)
     livro_registo = models.CharField(max_length=50, editable=False)
     
     data_emissao = models.DateField(default=timezone.now, editable=True)
@@ -352,28 +374,43 @@ class Certificado(models.Model):
         
     def clean(self):
         super().clean()
-        if hasattr(self, 'matricula') and self.matricula.numero_matricula != self.numero_processo:
-            self.numero_processo = self.matricula.numero_matricula
         
+        # Verificação única e clara da matrícula
+        if not hasattr(self, 'matricula') or not self.matricula:
+            raise ValidationError({'matricula': 'Este campo é obrigatório'})
+        
+        # Atualiza número do processo se necessário
+        if self.matricula.numero_matricula != self.numero_processo:
+            self.numero_processo = self.matricula.numero_matricula
+
+        # Verifica se matrícula está ativa
+        if not self.matricula.ativo:
+            raise ValidationError({
+                'matricula': 'Não é possível emitir certificado para matrícula inativa. '
+                           'Ative a matrícula primeiro.'
+            })
+    
     def save(self, *args, **kwargs):
         if not self.numero_certificado:
             self.gerar_numero_certificado()
                 
-        if not hasattr(self, 'matricula'):
-            raise ValueError("Certificado deve estar associado a uma matrícula")
+        if hasattr(self, 'matricula') and self.matricula:
+            if not self.numero_processo:
+                self.numero_processo = self.matricula.numero_matricula
+            
+            if not self.ano_letivo:
+                self.ano_letivo = self.matricula.ano_letivo
                 
-        if not self.numero_processo:
-            self.numero_processo = self.matricula.numero_matricula
-                
-        if not self.ano_letivo:
-            self.ano_letivo = self.matricula.ano_letivo
-                
+            if not self.matricula.ativo:
+                raise ValidationError("Não é possível emitir certificado para matrícula inativa")
+
         if not self.livro_registo:
             self.livro_registo = f"{timezone.now().strftime('%d%m%y')}_{slugify(self.numero_certificado)}"
                 
         super().save(*args, **kwargs)
                 
-        self.atualizar_medias()
+        if hasattr(self, 'matricula') and self.matricula:
+            self.atualizar_medias()
                 
         if not self.codigo_qr:
             self.gerar_qr_code()

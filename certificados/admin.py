@@ -85,7 +85,7 @@ class CertificadoAdmin(admin.ModelAdmin):
     readonly_fields = (
         'numero_certificado', 'numero_processo', 'ano_letivo', 
         'media_curricular', 'classificacao_final', 'codigo_verificacao', 
-        'livro_registo', 'codigo_qr_preview', 'data_criacao', 'data_atualizacao'
+        'livro_registo', 'codigo_qr_preview', 'data_criacao', 'data_atualizacao', 'data_emissao'
     )
     
     autocomplete_fields = ['matricula', 'diretor', 'criado_por']
