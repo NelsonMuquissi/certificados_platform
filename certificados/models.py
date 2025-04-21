@@ -12,6 +12,7 @@ from django.utils.text import slugify
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from datetime import date
+from django.core.mail import send_mail
 
 
 PROVINCIAS_ANGOLA = (
@@ -170,6 +171,7 @@ class Aluno(models.Model):
                 )
     
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
         # Define a senha como o número de identificação (hasheado) se estiver vazia
         if not self.senha:
             self.senha = make_password(self.numero_identificacao)
@@ -183,6 +185,58 @@ class Aluno(models.Model):
         # Força a validação antes de salvar
         self.full_clean()
         super().save(*args, **kwargs)
+        
+        if is_new and self.email:
+            try:
+                self.enviar_email_boas_vindas()
+            except Exception as e:
+                # Captura qualquer erro no envio de email e registra, mas não interrompe
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Falha ao enviar email de boas-vindas: {str(e)}", exc_info=True)
+
+    def enviar_email_boas_vindas(self):
+        try:
+            assunto = "Bem-vindo ao IPIC - Sua Jornada Começa Aqui!"
+            mensagem = f'''
+            Olá {self.nome_completo}!
+
+            Seja muito bem-vindo(a) ao Instituto Politécnico Industrial do Calumbo!
+
+            Estamos muito felizes por você fazer parte da nossa comunidade acadêmica. 
+            Aqui estão suas credenciais de acesso à plataforma:
+
+            - Email: {self.email}
+            - Senha inicial: Seu número de documento ({self.numero_identificacao})
+            
+            Recomendamos que:
+            1. Acesse o sistema o quanto antes
+            2. Altere sua senha para uma mais segura
+            3. Complete seu perfil acadêmico
+
+            Acesse nossa plataforma em: {settings.BASE_URL}
+
+            Em caso de dúvidas, entre em contato com nossa equipe de suporte:
+            Email: suporte@ipic.ed.ao
+            Telefone: +244 936 327 119
+
+            Estamos à disposição para apoiar seu sucesso acadêmico!
+
+            Atenciosamente,
+            Direção Acadêmica
+            IPIC - Instituto Politécnico Industrial do Calumbo
+            '''
+            
+            send_mail(
+                assunto,
+                mensagem,
+                settings.EMAIL_HOST_USER,
+                [self.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            # Re-lança a exceção para ser capturada no método save
+            raise
 
 class AreaFormacao(models.Model):
     nome = models.CharField(max_length=100, unique=True)
@@ -391,6 +445,8 @@ class Certificado(models.Model):
             })
     
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
+    
         if not self.numero_certificado:
             self.gerar_numero_certificado()
                 
@@ -406,9 +462,9 @@ class Certificado(models.Model):
 
         if not self.livro_registo:
             self.livro_registo = f"{timezone.now().strftime('%d%m%y')}_{slugify(self.numero_certificado)}"
-                
+            
         super().save(*args, **kwargs)
-                
+            
         if hasattr(self, 'matricula') and self.matricula:
             self.atualizar_medias()
                 
@@ -416,6 +472,57 @@ class Certificado(models.Model):
             self.gerar_qr_code()
                 
         super().save(*args, **kwargs)
+
+        if is_new and hasattr(self, 'matricula') and hasattr(self.matricula, 'aluno'):
+            try:
+                self.enviar_email_certificado()
+            except Exception as e:
+                # Captura qualquer erro no envio de email e registra, mas não interrompe
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Falha ao enviar email de certificado: {str(e)}", exc_info=True)
+
+        def enviar_email_certificado(self):
+            try:
+                aluno = self.matricula.aluno
+                assunto = "Seu Certificado foi Emitido - IPIC"
+                mensagem = f'''
+                Prezado(a) {aluno.nome_completo},
+
+                É com grande satisfação que informamos que seu certificado foi emitido com sucesso!
+
+                Detalhes do Certificado:
+                - Número: {self.numero_certificado}
+                - Curso: {self.matricula.curso.nome}
+                - Data de Emissão: {self.data_emissao.strftime('%d/%m/%Y')}
+                - Classificação Final: {self.classificacao_final}
+
+                Seu certificado pode ser verificado a qualquer momento usando o código único:
+                {self.codigo_verificacao}
+
+                Ou através do QR Code disponível no documento.
+
+                Este certificado representa a conclusão bem-sucedida de seu curso e está disponível 
+                para download em sua área do aluno.
+
+                Parabéns por esta conquista importante!
+
+                Atenciosamente,
+                Direção Acadêmica
+                IPIC - Instituto Politécnico Industrial do Calumbo
+                '''
+                
+                send_mail(
+                    assunto,
+                    mensagem,
+                    settings.EMAIL_HOST_USER,
+                    [aluno.email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                # Re-lança a exceção para ser capturada no método save
+                raise
+
 
 class ResultadoDisciplina(models.Model):
     certificado = models.ForeignKey(Certificado, on_delete=models.CASCADE, related_name='resultados_disciplinas')
