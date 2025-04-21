@@ -424,3 +424,35 @@ h1, h2, h3, h4, h5, h6 {
         margin-bottom: 1.5rem;
     }
 }
+
+/* FAQ Section Styles */
+.accordion-button {
+    background-color: white;
+    color: var(--primary-color);
+    font-size: 1.05rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: rgba(13, 71, 161, 0.05);
+    color: var(--primary-dark);
+}
+
+.accordion-button::after {
+    background-size: 1.2rem;
+}
+
+.accordion-body {
+    padding: 1.5rem;
+    background-color: rgba(13, 71, 161, 0.03);
+}
+
+.accordion-item {
+    transition: all 0.3s ease;
+}
+
+.accordion-item:hover {
+    transform: translateX(5px);
+}
+

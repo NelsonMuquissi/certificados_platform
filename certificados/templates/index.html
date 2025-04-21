@@ -47,6 +47,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#testimonials">Depoimentos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#faq">FAQ</a>
+                    </li>
                     <li class="nav-item ms-lg-2">
                         <a href="{% url 'login' %}" class="btn btn-primary px-3 px-lg-4">
                             <i class="fas fa-sign-in-alt me-2"></i>Acessar
@@ -516,6 +519,99 @@
                     </div>
                 </div>
                 <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Perguntas Frequentes</h2>
+                <p class="lead text-muted">Tire suas dúvidas sobre os certificados digitais</p>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <!-- FAQ Item 1 -->
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                            <h3 class="accordion-header" id="headingOne">
+                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                    Como posso obter meu certificado digital?
+                                </button>
+                            </h3>
+                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Após a conclusão do curso e aprovação, seu certificado será automaticamente gerado e disponibilizado em sua área do aluno. Você receberá uma notificação por e-mail quando estiver disponível.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ Item 2 -->
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                            <h3 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                    Meu certificado digital tem validade legal?
+                                </button>
+                            </h3>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Sim, nossos certificados digitais possuem a mesma validade jurídica que os certificados impressos, conforme a legislação angolana. Eles são assinados digitalmente e registrados em blockchain para garantir sua autenticidade.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ Item 3 -->
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                            <h3 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                    Posso imprimir meu certificado digital?
+                                </button>
+                            </h3>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Sim, você pode imprimir seu certificado digital, mas recomendamos que sempre forneça o código de verificação ou QR code para que terceiros possam validar a autenticidade do documento diretamente em nosso sistema.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ Item 4 -->
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                            <h3 class="accordion-header" id="headingFour">
+                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                                    Como as empresas podem verificar meu certificado?
+                                </button>
+                            </h3>
+                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    As empresas podem verificar seu certificado de três formas: 1) Digitalizando o QR code; 2) Inserindo o código de verificação único em nosso site; 3) Pesquisando pelo seu número de matrícula. Todas as opções estão disponíveis na seção de verificação.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ Item 5 -->
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                            <h3 class="accordion-header" id="headingFive">
+                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                                    E se eu perder o acesso ao meu certificado?
+                                </button>
+                            </h3>
+                            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Não se preocupe! Seus certificados ficam permanentemente armazenados em nosso sistema. Basta acessar sua conta na área do aluno ou entrar em contato com nossa secretaria acadêmica para recuperar o acesso.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-5">
+                        <p class="mb-4">Ainda tem dúvidas? Estamos aqui para ajudar!</p>
+                        <a href="#contact" class="btn btn-primary px-4">
+                            <i class="fas fa-envelope me-2"></i>Entre em Contato
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
