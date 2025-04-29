@@ -88,23 +88,23 @@ WSGI_APPLICATION = 'certificados_platform.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
+}"""
 
-"""DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'certificados_db',
-        'USER': 'certificados_user',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
+        'NAME': 'certificados_db_5g60',
+        'USER': 'admin',
+        'PASSWORD': 'f7VY3gRpIe4a1Yvg2QsK4oc83y0mSQgE',
+        'HOST': 'dpg-d08c4es9c44c73bpv570-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
-}"""
+}
 
 
 # Password validation
