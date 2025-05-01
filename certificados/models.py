@@ -13,6 +13,8 @@ from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from datetime import date
 from django.core.mail import send_mail
+from num2words import num2words
+from decimal import Decimal, ROUND_HALF_UP
 
 
 PROVINCIAS_ANGOLA = (
@@ -522,7 +524,45 @@ class Certificado(models.Model):
             except Exception as e:
                 # Re-lança a exceção para ser capturada no método save
                 raise
+    # Métodos para notas por extenso
+    def get_nota_formatada(self, valor):
+        """Formata a nota como inteiro, arredondando corretamente"""
+        try:
+            valor = Decimal(str(valor)).quantize(
+                Decimal('1'), rounding=ROUND_HALF_UP
+            )
+            return str(int(valor))
+        except:
+            return "0"
 
+    def get_nota_extenso(self, valor):
+        """Converte a nota arredondada para extenso (apenas inteiros)"""
+        try:
+            valor = Decimal(str(valor)).quantize(
+                Decimal('1'), rounding=ROUND_HALF_UP
+            )
+            return num2words(int(valor), lang='pt').upper()
+        except:
+            return "ZERO"
+
+    # Mantenha os outros métodos como estão, mas agora usarão a versão inteira
+    def get_media_formatada(self):
+        return self.get_nota_formatada(self.media_curricular)
+    
+    def get_pap_formatada(self):
+        return self.get_nota_formatada(self.prova_aptidao_profissional)
+    
+    def get_classificacao_formatada(self):
+        return self.get_nota_formatada(self.classificacao_final)
+    
+    def get_media_extenso(self):
+        return self.get_nota_extenso(self.media_curricular)
+    
+    def get_pap_extenso(self):
+        return self.get_nota_extenso(self.prova_aptidao_profissional)
+    
+    def get_classificacao_extenso(self):
+        return self.get_nota_extenso(self.classificacao_final)
 
 class ResultadoDisciplina(models.Model):
     certificado = models.ForeignKey(Certificado, on_delete=models.CASCADE, related_name='resultados_disciplinas')
@@ -557,6 +597,27 @@ class ResultadoDisciplina(models.Model):
         elif nota >= 14: return "Bom"
         elif nota >= 10: return "Suficiente"
         else: return "Insuficiente"
+    
+    # Métodos para formatação de notas
+    def get_nota_formatada(self):
+        """Formata a nota como inteiro"""
+        try:
+            nota = Decimal(str(self.nota_numerica)).quantize(
+                Decimal('1'), rounding=ROUND_HALF_UP
+            )
+            return str(int(nota))
+        except:
+            return "0"
+
+    def get_nota_extenso(self):
+        """Converte a nota arredondada para extenso (apenas inteiros)"""
+        try:
+            nota = Decimal(str(self.nota_numerica)).quantize(
+                Decimal('1'), rounding=ROUND_HALF_UP
+            )
+            return num2words(int(nota), lang='pt').upper()
+        except:
+            return "ZERO"
 
 class ConfiguracaoSistema(models.Model):
     nome_instituicao = models.CharField(max_length=200, default="Instituto Politecnico Industrial do Icolo e Bengo")
