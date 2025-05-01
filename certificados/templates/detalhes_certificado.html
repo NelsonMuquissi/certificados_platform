@@ -460,7 +460,7 @@
 </html>--->
 
 {% load static %}
-<!DOCTYPE html>
+<!---<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -473,7 +473,7 @@
     <style>
         @page {
             size: A4;
-            margin: 0;
+            margin: 5mm 0;
         }
 
         body {
@@ -485,9 +485,9 @@
 
         .certificate-container {
             width: 210mm;
-            min-height: 297mm;
+            min-height: 290mm; /* Reduzido para caber na página impressa */
             margin: 0 auto;
-            padding: 15mm;
+            padding: 10mm 15mm;
             background-color: #fffef7;
             border: 3px double #000;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -526,41 +526,42 @@
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             position: relative;
             z-index: 1;
         }
 
         .header img.logo {
-            width: 70px;
-            margin-bottom: 10px;
+            width: 60px;
+            margin-bottom: 5px;
         }
 
         .header h3 {
-            margin: 5px 0;
+            margin: 3px 0;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             color: #1a3c34;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
         }
 
         .header h3:first-of-type {
             font-weight: 700;
             color: #b71c1c;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         .title {
             text-align: center;
-            margin: 20px 0;
-            padding-bottom: 10px;
+            margin: 10px 0;
+            padding-bottom: 5px;
             border-bottom: 1px solid #000;
         }
 
         .title h2 {
             margin: 0;
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 700;
             font-family: 'Playfair Display', serif;
             text-transform: uppercase;
@@ -568,8 +569,8 @@
         }
 
         .title h3 {
-            margin: 8px 0 0 0;
-            font-size: 18px;
+            margin: 5px 0 0 0;
+            font-size: 15px;
             font-weight: 500;
             font-family: 'Playfair Display', serif;
             text-transform: uppercase;
@@ -578,15 +579,15 @@
 
         .content {
             text-align: justify;
-            line-height: 1.6;
-            font-size: 13px;
+            line-height: 1.4;
+            font-size: 11px;
             color: #333;
             position: relative;
             z-index: 1;
         }
 
         .content p {
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
 
         .content strong {
@@ -594,67 +595,61 @@
             font-weight: 500;
         }
 
-        .table-section {
-            margin: 20px 0;
-            page-break-inside: avoid;
+        .disciplines-section {
+            margin: 10px 0;
         }
 
-        .table-section h4 {
+        .disciplines-category {
+            margin-bottom: 8px;
+        }
+
+        .disciplines-category h4 {
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            font-size: 15px;
+            font-size: 13px;
             color: #1a3c34;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             border-bottom: 1px solid #ddd;
-            padding-bottom: 3px;
+            padding-bottom: 2px;
         }
 
-        .table-responsive {
-            overflow-x: auto;
-            margin-bottom: 15px;
+        .discipline-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            font-size: 11px;
         }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            margin-bottom: 10px;
+        .discipline-name {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
-        .table th {
-            background-color: #f8f9fa;
-            color: #000;
-            font-weight: 600;
-            padding: 6px 8px;
-            text-align: left;
-            border-bottom: 2px solid #dee2e6;
-            font-size: 12px;
+        .discipline-name:after {
+            content: "....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................";
+            display: inline-block;
+            vertical-align: bottom;
+            color: #333;
+            margin-left: 5px;
         }
 
-        .table td {
-            padding: 5px 8px;
-            border: 1px solid #dee2e6;
-            font-size: 12px;
-        }
-
-        .table tr:nth-child(even) td {
-            background-color: #f8f9fa;
-        }
-
-        .table tr:nth-child(odd) td {
-            background-color: #fff;
+        .discipline-grade {
+            flex-shrink: 0;
+            margin-left: 5px;
+            white-space: nowrap;
         }
 
         .results {
-            margin: 20px 0;
-            font-size: 13px;
+            margin: 10px 0;
+            font-size: 11px;
             background-color: #f8f8f8;
-            padding: 12px;
+            padding: 8px;
             border-left: 3px solid #000;
         }
 
         .results p {
-            margin: 6px 0;
+            margin: 4px 0;
             display: flex;
             justify-content: space-between;
         }
@@ -664,17 +659,17 @@
         }
 
         .footer-text {
-            margin-top: 20px;
-            font-size: 13px;
+            margin-top: 10px;
+            font-size: 11px;
             text-align: justify;
-            padding: 10px;
+            padding: 6px;
             background-color: #f8f8f8;
-            border-radius: 3px;
+            border-radius: 2px;
         }
 
         .signatures-container {
-            margin-top: 40px;
-            margin-bottom: 60px;
+            margin-top: 20px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             text-align: center;
@@ -688,43 +683,497 @@
         }
 
         .signature p {
-            margin: 5px 0;
-            font-size: 13px;
+            margin: 3px 0;
+            font-size: 11px;
         }
 
         .signature p.title {
             font-weight: 600;
             color: #1a3c34;
-            font-size: 13px;
+            font-size: 11px;
         }
 
         .signature p.subtitle {
-            font-size: 11px;
+            font-size: 9px;
             color: #555;
         }
 
         .date {
             text-align: center;
-            margin-top: 10px;
+            margin-top: 6px;
             font-style: italic;
-            font-size: 13px;
+            font-size: 11px;
         }
 
         .qr-code {
             position: absolute;
-            bottom: 20mm;
+            bottom: 10mm;
             right: 15mm;
             text-align: center;
             background: white;
-            padding: 5px;
+            padding: 3px;
             border: 1px solid #e0e0e0;
-            border-radius: 3px;
+            border-radius: 2px;
             z-index: 1;
         }
 
         .qr-code img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .qr-code p {
+            font-size: 6px;
+            margin: 1px 0 0 0;
+            color: #555;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-buttons .btn {
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 2px;
+        }
+
+        @media print {
+            body {
+                background: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .certificate-container {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 10mm 15mm;
+                border: none;
+                box-shadow: none;
+                background-image: none;
+                min-height: auto;
+            }
+            
+            .action-buttons {
+                display: none !important;
+            }
+            
+            @page {
+                margin: 5mm 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="certificate-container">
+    <div class="header">
+        <img src="{% static 'img/insignia.png' %}" alt="ANGOLA" class="logo">
+        <h3 style="color: inherit;">REPÚBLICA DE ANGOLA</h3>
+        <h3>MINISTÉRIO DA EDUCAÇÃO</h3>
+        <h3>INSTITUTO POLITÉCNICO INDUSTRIAL Nº 6081 "17 DE DEZEMBRO"</h3>
+    </div>
+
+    Título do certificado 
+    <div class="title">
+        <h2>CERTIFICADO DE HABILITAÇÕES</h2>
+        <h3>Conclusão de Curso</h3>
+    </div>
+
+     Corpo do certificado 
+    <div class="content">
+        <p>
+            A {{ certificado.cargo_diretor }}, <strong>{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</strong> 
+            e o Subdirector Pedagógico <strong>Mendes Antônio Dini</strong>, certificam de acordo com o artº 25º e 27º dos Estatutos do Subsistema 
+            do Ensino Técnico Profissional, aprovado pelo Decreto nº 9004 de 3 de Dezembro de 2004, que 
+            <strong>{{ certificado.matricula.aluno.nome_completo|upper }}</strong>, filho de 
+            <strong>{{ certificado.matricula.aluno.nome_pai|upper }}</strong> e de 
+            <strong>{{ certificado.matricula.aluno.nome_mae|upper }}</strong>, natural de 
+            <strong>{{ certificado.matricula.aluno.local_nascimento|upper }}</strong>, Província 
+            <strong>{{ certificado.matricula.aluno.get_provincia_display|upper }}</strong>, nascido aos 
+            <strong>{{ certificado.matricula.aluno.data_nascimento|date:"d/m/Y" }}</strong>, portador do 
+            <strong>{{ certificado.matricula.aluno.get_tipo_identificacao_display }} nº {{ certificado.matricula.aluno.numero_identificacao }}</strong>, 
+            passado pelo <strong>{{ certificado.matricula.aluno.emissor_identificacao|upper }}</strong> aos 
+            <strong>{{ certificado.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}</strong>, 
+            <strong>CONCLUIU</strong> em regime <strong>{{ certificado.matricula.get_turno_display|upper }}</strong>, no ano lectivo de 
+            <strong>{{ certificado.ano_letivo }}</strong> o curso de 
+            <strong>{{ certificado.matricula.curso.nome|upper }}</strong> na área de Formação de 
+            <strong>{{ certificado.matricula.curso.area_formacao.nome|upper }}</strong>, tendo obtido as seguintes 
+            classificações, conforme consta no processo individual nº <strong>{{ certificado.numero_processo }}</strong> e da folha nº 
+            <strong>010</strong> do Livro de Termos:
+        </p>
+
+       Disciplinas formatadas com tracejados 
+        <div class="disciplines-section">
+            <div class="disciplines-category">
+                <h4>Componente Sócio-cultural</h4>
+                {% for resultado in socio_cultural %}
+                <div class="discipline-row">
+                    <span class="discipline-name">{{ resultado.disciplina.nome }}</span>
+                    <span class="discipline-grade">{{ resultado.nota_numerica }} ({{ resultado.nota_por_extenso|upper }}) Valores</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="disciplines-category">
+                <h4>Componente Científica</h4>
+                {% for resultado in cientifica %}
+                <div class="discipline-row">
+                    <span class="discipline-name">{{ resultado.disciplina.nome }}</span>
+                    <span class="discipline-grade">{{ resultado.nota_numerica }} ({{ resultado.nota_por_extenso|upper }}) Valores</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="disciplines-category">
+                <h4>Componente Técnica, Tecnológica e Prática</h4>
+                {% for resultado in tecnica %}
+                <div class="discipline-row">
+                    <span class="discipline-name">{{ resultado.disciplina.nome }}</span>
+                    <span class="discipline-grade">{{ resultado.nota_numerica }} ({{ resultado.nota_por_extenso|upper }}) Valores</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+         Resultados finais
+        <div class="results">
+            <p><strong>Classificação Final do Plano Curricular (PC):</strong> <span>{{ certificado.media_curricular }} ({{ certificado.media_curricular|floatformat:"0" }} Valores)</span></p>
+            <p><strong>Classificação da Prova de Aptidão Profissional (PAP):</strong> <span>{{ certificado.prova_aptidao_profissional }} ({{ certificado.prova_aptidao_profissional|floatformat:"0" }} Valores)</span></p>
+            <p><strong>Classificação Final do Curso:</strong> <span>{{ certificado.classificacao_final }} ({{ certificado.classificacao_final|floatformat:"0" }} Valores)</span></p>
+        </div>
+
+         Rodapé do certificado 
+        <div class="footer-text">
+            <p>
+                Para os devidos fins, emitimos o presente Certificado, que será válido em todo o território nacional, conforme disposto no Decreto nº 9004 de 3 de Dezembro de 2004, que aprova os Estatutos do Subsistema do Ensino Técnico Profissional.
+            </p>
+        </div>
+    </div>
+
+     Data e assinaturas 
+    <div class="date">
+        <p>Luanda, {{ certificado.data_emissao|date:"j \d\e F \d\e Y" }}</p>
+    </div>
+
+    <div class="signatures-container">
+        <div style="width: 45%; text-align: center;">
+            <div style="position: relative;">
+                <div class="signature">
+                    <p class="title">{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</p>
+                    <p class="subtitle">Directora do Instituto</p>
+                </div>
+                {% if certificado.diretor.assinatura %}
+                <img src="{{ certificado.diretor.assinatura.url }}" alt="Assinatura" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 70px; height: 25px; object-fit: contain;">
+                {% endif %}
+            </div>
+        </div>
+        
+        <div style="width: 45%; text-align: center;">
+            <div style="position: relative;">
+                <div class="signature">
+                    <p class="title">Mendes Antônio Dini</p>
+                    <p class="subtitle">Subdirector Pedagógico</p>
+                </div>
+                {% if certificado.subdirector.assinatura %}
+                <img src="{{ certificado.subdirector.assinatura.url }}" alt="Assinatura" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 70px; height: 25px; object-fit: contain;">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+     QR Code para verificação 
+    <div class="qr-code">
+        {% if certificado.codigo_qr %}
+        <img src="{{ certificado.codigo_qr.url }}" alt="QR Code de Verificação">
+        <p>Verificar autenticidade</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="action-buttons">
+    <button onclick="window.print()" class="btn btn-primary">
+        <i class="fas fa-file-pdf"></i> Baixar Certificado
+    </button>
+    <a href="{% url 'painel_aluno' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajuste para impressão
+        window.addEventListener('beforeprint', function() {
+            document.body.style.zoom = '90%';
+        });
+        
+        window.addEventListener('afterprint', function() {
+            document.body.style.zoom = '';
+        });
+    });
+</script>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificado de Conclusão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .certificate-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 8mm 15mm 5mm 15mm;
+            background-color: #fffef7;
+            border: 3px double #000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(to right, #e6d9a2 0%, #fffef7 10%, #fffef7 90%, #e6d9a2 100%);
+            page-break-inside: avoid;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .header h3 {
+            margin: 2px 0;
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #1a3c34;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+
+        .header h3:first-of-type {
+            font-weight: 700;
+            color: #b71c1c;
+            margin-top: 3px;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding-bottom: 3px;
+            border-bottom: 1px solid #000;
+        }
+
+        .title-logo {
+            margin-right: 15px;
+        }
+
+        .title-logo img {
             width: 50px;
-            height: 50px;
+        }
+
+        .title-text {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .title-text h2 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+            color: #b71c1c;
+        }
+
+        .title-text h3 {
+            margin: 3px 0 0 0;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+            color: #1a3c34;
+        }
+
+        .content {
+            text-align: justify;
+            line-height: 1.4;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .content p {
+            margin-bottom: 8px;
+        }
+
+        .content strong {
+            color: #1a3c34;
+            font-weight: 500;
+        }
+
+        .disciplines-section {
+            margin: 10px 0;
+        }
+
+        .disciplines-category {
+            margin-bottom: 6px;
+        }
+
+        .disciplines-category h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 13px;
+            color: #1a3c34;
+            margin-bottom: 3px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 2px;
+        }
+
+        .discipline-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            font-size: 12px;
+        }
+
+        .discipline-name {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .discipline-name:after {
+            content: "....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................";
+            display: inline-block;
+            vertical-align: bottom;
+            color: #333;
+            margin-left: 3px;
+        }
+
+        .discipline-grade {
+            flex-shrink: 0;
+            margin-left: 3px;
+            white-space: nowrap;
+        }
+
+        .results {
+            margin: 10px 0;
+            font-size: 12px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .result-label {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .result-label:after {
+            content: "....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................";
+            display: inline-block;
+            vertical-align: bottom;
+            color: #333;
+            margin-left: 3px;
+        }
+
+        .result-value {
+            flex-shrink: 0;
+            margin-left: 3px;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .footer-text {
+            margin-top: 10px;
+            font-size: 12px;
+            text-align: justify;
+            padding: 6px;
+            background-color: #f8f8f8;
+            border-radius: 2px;
+        }
+
+        .signature-qr-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        .signatures {
+            width: 70%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signature {
+            width: 45%;
+            text-align: center;
+        }
+
+        .signature p {
+            margin: 2px 0;
+            font-size: 12px;
+        }
+
+        .signature p.title {
+            font-weight: 600;
+            color: #1a3c34;
+            margin-top: 15px;
+        }
+
+        .signature p.subtitle {
+            font-size: 10px;
+            color: #555;
+        }
+
+        .signature-line {
+            height: 1px;
+            border-bottom: 1px solid #000;
+            margin: 0 auto;
+            width: 80%;
+        }
+
+        .qr-code {
+            width: 25%;
+            text-align: center;
+            background: white;
+            padding: 2px;
+            border: 1px solid #e0e0e0;
+            border-radius: 2px;
+        }
+
+        .qr-code img {
+            width: 60px;
+            height: 60px;
         }
 
         .qr-code p {
@@ -733,45 +1182,551 @@
             color: #555;
         }
 
-        .action-buttons {
+        .date {
             text-align: center;
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .action-buttons .btn {
-            font-size: 14px;
-            padding: 10px 20px;
-            border-radius: 4px;
+            margin-top: 3px;
+            font-style: italic;
+            font-size: 12px;
         }
 
         @media print {
-            body * {
-                visibility: hidden;
+            body {
+                background: none;
+                margin: 0;
+                padding: 0;
             }
-            .certificate-container, .certificate-container * {
-                visibility: visible;
-            }
+            
             .certificate-container {
-                position: absolute;
-                left: 0;
-                top: 0;
                 width: 100%;
                 height: 100%;
                 margin: 0;
-                padding: 15mm;
+                padding: 8mm 15mm 5mm 15mm;
                 border: none;
                 box-shadow: none;
                 background-image: none;
+                min-height: 297mm;
             }
+            
             .action-buttons {
                 display: none !important;
             }
         }
+    </style>
+</head>
+<body>
+<div class="certificate-container">
+    <div class="header">
+        <h3 style="color: inherit;">REPÚBLICA DE ANGOLA</h3>
+        <h3>MINISTÉRIO DA EDUCAÇÃO</h3>
+        <h3>INSTITUTO POLITÉCNICO INDUSTRIAL Nº 6081 "17 DE DEZEMBRO"</h3>
+    </div>
 
+
+    <div class="title-container">
+        <div class="title-logo">
+            <img src="logo_escola.png" alt="Logo da Escola">
+        </div>
+        <div class="title-text">
+            <h2>CERTIFICADO DE HABILITAÇÕES</h2>
+            <h3>Conclusão de Curso</h3>
+        </div>
+    </div>
+
+    <div class="content">
+        <p>
+            A Directora do Instituto, <strong>Joana Francisco da Rocha Francisco</strong> e o Subdirector Pedagógico <strong>Mendes Antônio Dini</strong>, certificam de acordo com o artº 25º e 27º dos Estatutos do Subsistema do Ensino Técnico Profissional, aprovado pelo Decreto nº 9004 de 3 de Dezembro de 2004, que <strong>CARLOS MURILSEI JAMOU XXXXXXXXXXXXXXXX</strong>, filho de <strong>Nelson Carmo Zanqui xxxxxxxxxxxxxx</strong> e de <strong>Elvira Nassema Murgussii xxxxxxxxxxxxxxx</strong>, natural de <strong>Viana xxxxxxxx</strong>, Província <strong>Luanda xxxxxx</strong>, nascido aos <strong>06/08/2003</strong>, portador do <strong>Bilhete de Identidade nº 0205794591A058</strong>, passado pelo <strong>Arquivo de Identificação de Luanda xxxxxxx</strong> aos <strong>13/02/2020</strong>, <strong>CONCLUIU</strong> em regime <strong>Diurno xxxxxx</strong>, no ano lectivo de <strong>23/24</strong> o curso de <strong>TECNICO DE INFORMA TICA XXXXXXXXXX</strong> na área de Formação de <strong>INFORMA TICA XXXXXXXXXX</strong>, tendo obtido as seguintes classificações, conforme consta no processo individual nº <strong>114</strong> e da folha nº <strong>010</strong> do Livro de Termos:
+        </p>
+
+     
+        <div class="disciplines-section">
+            <div class="disciplines-category">
+                <h4>Componente Sócio-cultural</h4>
+                <div class="discipline-row">
+                    <span class="discipline-name">Português</span>
+                    <span class="discipline-grade">11 (Oraze) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Inglês</span>
+                    <span class="discipline-grade">11 (Oraze) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Formação de Atitudes Integradoras</span>
+                    <span class="discipline-grade">12 (Doze) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Educação Física</span>
+                    <span class="discipline-grade">13 (Treze) Valores</span>
+                </div>
+            </div>
+
+            <div class="disciplines-category">
+                <h4>Componente Científica</h4>
+                <div class="discipline-row">
+                    <span class="discipline-name">Matemática</span>
+                    <span class="discipline-grade">10 (Dez) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Química</span>
+                    <span class="discipline-grade">11 (Oraze) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Física</span>
+                    <span class="discipline-grade">10 (Dez) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Electróticina</span>
+                    <span class="discipline-grade">10 (Dez) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Organização e Gestão industrial</span>
+                    <span class="discipline-grade">10 (Dez) Valores</span>
+                </div>
+            </div>
+
+            <div class="disciplines-category">
+                <h4>Componente Técnica, Tecnológica e Prática</h4>
+                <div class="discipline-row">
+                    <span class="discipline-name">Empreendedorismo</span>
+                    <span class="discipline-grade">11 (Oraze) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Desenho Técnico</span>
+                    <span class="discipline-grade">10 (Dez) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Técnicas de Linguagem de Programação</span>
+                    <span class="discipline-grade">12 (Doze) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Técnicas de Repuração de Sistemas Informáticos</span>
+                    <span class="discipline-grade">11 (Oraze) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Sistemas de Exploração e Arquitetura de Computadores</span>
+                    <span class="discipline-grade">12 (Doze) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Tecnologia de Informação e Comunicação</span>
+                    <span class="discipline-grade">12 (Doze) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Projecto Tecnológico</span>
+                    <span class="discipline-grade">10 (Dez) Valores</span>
+                </div>
+                <div class="discipline-row">
+                    <span class="discipline-name">Estágio Curricular</span>
+                    <span class="discipline-grade">12 (Doze) Valores</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="results">
+            <div class="result-row">
+                <span class="result-label">Classificação Final do Plano Curricular (PC)</span>
+                <span class="result-value">11 (Oraze) Valores</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Classificação da Prova de Aptidão Profissional (PAP)</span>
+                <span class="result-value">17 (Dezassete) Valores</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Classificação Final do Curso = (2xPC+PAP)/3</span>
+                <span class="result-value">13 (Treze) Valores</span>
+            </div>
+        </div>
+
+
+        <div class="footer-text">
+            <p>
+                Pelo que, para efeitos legais e de harmonia com a legislação em vigor, lhe mandamos passar o presente Certificado, que vai por nós assinado e autenticado com carimbo a óleo e selo branco em uso nesta Instituição.
+            </p>
+        </div>
+    </div>
+
+    <div class="signature-qr-container">
+        <div class="signatures">
+            <div class="signature">
+                <div class="signature-line"></div>
+                <p class="title">Joana Francisco da Rocha Francisco</p>
+                <p class="subtitle">Directora do Instituto</p>
+            </div>
+            
+            <div class="signature">
+                <div class="signature-line"></div>
+                <p class="title">Mendes Antônio Dini</p>
+                <p class="subtitle">Subdirector Pedagógico</p>
+            </div>
+        </div>
         
+        <div class="qr-code">
+            <img src="qr_code.png" alt="QR Code de Verificação">
+            <p>Verificar autenticidade</p>
+        </div>
+    </div>
+
+    <div class="date">
+        <p>Luanda, 19 de Julho de 2024</p>
+    </div>
+</div>
+
+<div class="action-buttons">
+    <button onclick="window.print()" class="btn btn-primary">
+        <i class="fas fa-file-pdf"></i> Baixar Certificado
+    </button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Garante que o conteúdo cabe em uma página
+        function adjustForPrint() {
+            const container = document.querySelector('.certificate-container');
+            if (container.scrollHeight > 297 * 3.78) { // 297mm em pixels (considerando 96dpi)
+                document.body.style.fontSize = '11px';
+            }
+        }
+
+        window.addEventListener('beforeprint', function() {
+            adjustForPrint();
+        });
+    });
+</script>
+</body>
+</html>
+
+/////////////////
+----->
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificado de Conclusão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="{% static 'img/ipiz.png' %}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .certificate-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 8mm 15mm 5mm 15mm; /* Reduzi padding superior e inferior */
+            background-color: #fffef7;
+            border: 3px double #000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(to right, #e6d9a2 0%, #fffef7 10%, #fffef7 90%, #e6d9a2 100%);
+            page-break-inside: avoid; /* Impede quebra de página interna */
+        }
+
+        .certificate-container::after {
+            content: '';
+            position: absolute;
+            top: 5mm;
+            left: 5mm;
+            right: 5mm;
+            bottom: 5mm;
+            border: 1px dashed #000;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        .certificate-container::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 60px;
+            color: rgba(26, 60, 52, 0.08);
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header img.logo {
+            width: 60px;
+            margin-bottom: 3px;
+        }
+
+        .header h3 {
+            margin: 2px 0;
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #1a3c34;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+
+        .header h3:first-of-type {
+            font-weight: 700;
+            color: #b71c1c;
+            margin-top: 3px;
+        }
+
+        .title {
+            text-align: center;
+            margin: 8px 0;
+            padding-bottom: 3px;
+            border-bottom: 1px solid #000;
+        }
+
+        .title h2 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+            color: #b71c1c;
+        }
+
+        .title h3 {
+            margin: 3px 0 0 0;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+            color: #1a3c34;
+        }
+
+        .content {
+            text-align: justify;
+            line-height: 1.4;
+            font-size: 12px;
+            color: #333;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content p {
+            margin-bottom: 8px;
+        }
+
+        .content strong {
+            color: #1a3c34;
+            font-weight: 500;
+        }
+
+        .disciplines-section {
+            margin: 10px 0;
+        }
+
+        .disciplines-category {
+            margin-bottom: 6px;
+        }
+
+        .disciplines-category h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 13px;
+            color: #1a3c34;
+            margin-bottom: 3px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 2px;
+        }
+
+        .discipline-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            font-size: 12px;
+        }
+
+        .discipline-name {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .discipline-name:after {
+            content: "....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................";
+            display: inline-block;
+            vertical-align: bottom;
+            color: #333;
+            margin-left: 3px;
+        }
+
+        .discipline-grade {
+            flex-shrink: 0;
+            margin-left: 3px;
+            white-space: nowrap;
+        }
+
+        .results {
+            margin: 10px 0;
+            font-size: 12px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .result-label {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .result-label:after {
+            content: "....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................";
+            display: inline-block;
+            vertical-align: bottom;
+            color: #333;
+            margin-left: 3px;
+        }
+
+        .result-value {
+            flex-shrink: 0;
+            margin-left: 3px;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .footer-text {
+            margin-top: 10px;
+            font-size: 12px;
+            text-align: justify;
+            padding: 6px;
+            background-color: #f8f8f8;
+            border-radius: 2px;
+        }
+
+        .signatures-container {
+            margin-top: 15px;
+            margin-bottom: 5px; /* Reduzido para caber melhor */
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            page-break-inside: avoid; /* Impede quebra nas assinaturas */
+        }
+
+        .signature {
+            width: 45%;
+            position: relative;
+        }
+
+        .signature p {
+            margin: 2px 0;
+            font-size: 12px;
+        }
+
+        .signature p.title {
+            font-weight: 600;
+            color: #1a3c34;
+            margin-top: 15px;
+        }
+
+        .signature p.subtitle {
+            font-size: 10px;
+            color: #555;
+        }
+
+        .signature-img {
+            height: 35px;
+            margin-bottom: 2px;
+        }
+
+        .date {
+            text-align: center;
+            margin-top: 3px;
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .qr-code {
+            position: absolute;
+            bottom: 5mm;
+            right: 15mm;
+            text-align: center;
+            background: white;
+            padding: 2px;
+            border: 1px solid #e0e0e0;
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+        .qr-code img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .qr-code p {
+            font-size: 6px;
+            margin: 1px 0 0 0;
+            color: #555;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-buttons .btn {
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 2px;
+        }
+
+        @media print {
+            body {
+                background: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .certificate-container {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 8mm 15mm 5mm 15mm;
+                border: none;
+                box-shadow: none;
+                background-image: none;
+                min-height: 297mm;
+            }
+            
+            .action-buttons {
+                display: none !important;
+            }
+            
+            @page {
+                margin: 0;
+                size: A4;
+            }
+        }
     </style>
 </head>
 <body>
@@ -792,111 +1747,73 @@
     <!-- Corpo do certificado -->
     <div class="content">
         <p>
-            <p>
-                A {{ certificado.cargo_diretor }}, <strong>{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</strong> 
-                e o Subdirector Pedagógico <strong>Mendes Antônio Dini</strong>, certificam de acordo com o artº 25º e 27º dos Estatutos do Subsistema 
-                do Ensino Técnico Profissional, aprovado pelo Decreto nº 9004 de 3 de Dezembro de 2004, que 
-                <strong>{{ certificado.matricula.aluno.nome_completo|upper }}</strong>, filho de 
-                <strong>{{ certificado.matricula.aluno.nome_pai|upper }}</strong> e de 
-                <strong>{{ certificado.matricula.aluno.nome_mae|upper }}</strong>, natural de 
-                <strong>{{ certificado.matricula.aluno.local_nascimento|upper }}</strong>, Província 
-                <strong>{{ certificado.matricula.aluno.get_provincia_display|upper }}</strong>, nascido aos 
-                <strong>{{ certificado.matricula.aluno.data_nascimento|date:"d/m/Y" }}</strong>, portador do 
-                <strong>{{ certificado.matricula.aluno.get_tipo_identificacao_display }} nº {{ certificado.matricula.aluno.numero_identificacao }}</strong>, 
-                passado pelo <strong>{{ certificado.matricula.aluno.emissor_identificacao|upper }}</strong> aos 
-                <strong>{{ certificado.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}</strong>, 
-                <strong>CONCLUIU</strong> em regime <strong>{{ certificado.matricula.get_turno_display|upper }}</strong>, no ano lectivo de 
-                <strong>{{ certificado.ano_letivo }}</strong> o curso de 
-                <strong>{{ certificado.matricula.curso.nome|upper }}</strong> na área de Formação de 
-                <strong>{{ certificado.matricula.curso.area_formacao.nome|upper }}</strong>, tendo obtido as seguintes 
-                classificações, conforme consta no processo individual nº <strong>{{ certificado.numero_processo }}</strong> e da folha nº 
-                <strong>010</strong> do Livro de Termos:
+            A {{ certificado.cargo_diretor }}, <strong>{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</strong> 
+            e o Subdirector Pedagógico <strong>Mendes Antônio Dini</strong>, certificam de acordo com o artº 25º e 27º dos Estatutos do Subsistema 
+            do Ensino Técnico Profissional, aprovado pelo Decreto nº 9004 de 3 de Dezembro de 2004, que 
+            <strong>{{ certificado.matricula.aluno.nome_completo|upper }}</strong>, filho de 
+            <strong>{{ certificado.matricula.aluno.nome_pai|upper }}</strong> e de 
+            <strong>{{ certificado.matricula.aluno.nome_mae|upper }}</strong>, natural de 
+            <strong>{{ certificado.matricula.aluno.local_nascimento|upper }}</strong>, Província 
+            <strong>{{ certificado.matricula.aluno.get_provincia_display|upper }}</strong>, nascido aos 
+            <strong>{{ certificado.matricula.aluno.data_nascimento|date:"d/m/Y" }}</strong>, portador do 
+            <strong>{{ certificado.matricula.aluno.get_tipo_identificacao_display }} nº {{ certificado.matricula.aluno.numero_identificacao }}</strong>, 
+            passado pelo <strong>{{ certificado.matricula.aluno.emissor_identificacao|upper }}</strong> aos 
+            <strong>{{ certificado.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}</strong>, 
+            <strong>CONCLUIU</strong> em regime <strong>{{ certificado.matricula.get_turno_display|upper }}</strong>, no ano lectivo de 
+            <strong>{{ certificado.ano_letivo }}</strong> o curso de 
+            <strong>{{ certificado.matricula.curso.nome|upper }}</strong> na área de Formação de 
+            <strong>{{ certificado.matricula.curso.area_formacao.nome|upper }}</strong>, tendo obtido as seguintes 
+            classificações, conforme consta no processo individual nº <strong>{{ certificado.numero_processo }}</strong> e da folha nº 
+            <strong>010</strong> do Livro de Termos:
         </p>
 
-        <!-- Tabelas de disciplinas responsivas -->
-        <div class="table-section">
-            <h4>Componente Sócio-cultural</h4>
-            {% if socio_cultural %}
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th style="width: 80%">Disciplina</th>
-                                <th style="width: 20%">Nota Numérica</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for resultado in socio_cultural %}
-                            <tr>
-                                <td>{{ resultado.disciplina.nome }}</td>
-                                <td>{{ resultado.nota_numerica }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <!-- Disciplinas formatadas com tracejados -->
+        <div class="disciplines-section">
+            <div class="disciplines-category">
+                <h4>Componente Sócio-cultural</h4>
+                {% for resultado in socio_cultural %}
+                <div class="discipline-row">
+                    <span class="discipline-name">{{ resultado.disciplina.nome }}</span>
+                    <span class="discipline-grade">{{ resultado.nota_numerica }} ({{ resultado.nota_por_extenso|upper }}) Valores</span>
                 </div>
-            {% else %}
-                <p class="text-muted">Nenhuma disciplina nesta categoria.</p>
-            {% endif %}
-        </div>
-        
-        <div class="table-section">
-            <h4>Componente Científica</h4>
-            {% if cientifica %}
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th style="width: 80%">Disciplina</th>
-                                <th style="width: 20%">Nota Numérica</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for resultado in cientifica %}
-                            <tr>
-                                <td>{{ resultado.disciplina.nome }}</td>
-                                <td>{{ resultado.nota_numerica }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                {% endfor %}
+            </div>
+
+            <div class="disciplines-category">
+                <h4>Componente Científica</h4>
+                {% for resultado in cientifica %}
+                <div class="discipline-row">
+                    <span class="discipline-name">{{ resultado.disciplina.nome }}</span>
+                    <span class="discipline-grade">{{ resultado.nota_numerica }} ({{ resultado.nota_por_extenso|upper }}) Valores</span>
                 </div>
-            {% else %}
-                <p class="text-muted">Nenhuma disciplina nesta categoria.</p>
-            {% endif %}
-        </div>
-        
-        <div class="table-section">
-            <h4>Componente Técnica, Tecnológica e Prática</h4>
-            {% if tecnica %}
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th style="width: 80%">Disciplina</th>
-                                <th style="width: 20%">Nota Numérica</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for resultado in tecnica %}
-                            <tr>
-                                <td>{{ resultado.disciplina.nome }}</td>
-                                <td>{{ resultado.nota_numerica }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                {% endfor %}
+            </div>
+
+            <div class="disciplines-category">
+                <h4>Componente Técnica, Tecnológica e Prática</h4>
+                {% for resultado in tecnica %}
+                <div class="discipline-row">
+                    <span class="discipline-name">{{ resultado.disciplina.nome }}</span>
+                    <span class="discipline-grade">{{ resultado.nota_numerica }} ({{ resultado.nota_por_extenso|upper }}) Valores</span>
                 </div>
-            {% else %}
-                <p class="text-muted">Nenhuma disciplina nesta categoria.</p>
-            {% endif %}
+                {% endfor %}
+            </div>
         </div>
 
-        <!-- Resultados finais -->
+        <!-- Resultados finais com tracejados -->
         <div class="results">
-            <p><strong>Classificação Final do Plano Curricular (PC):</strong> <span>{{ certificado.media_curricular }} ({{ certificado.media_curricular|floatformat:"0" }} Valores)</span></p>
-            <p><strong>Classificação da Prova de Aptidão Profissional (PAP):</strong> <span>{{ certificado.prova_aptidao_profissional }} ({{ certificado.prova_aptidao_profissional|floatformat:"0" }} Valores)</span></p>
-            <p><strong>Classificação Final do Curso:</strong> <span>{{ certificado.classificacao_final }} ({{ certificado.classificacao_final|floatformat:"0" }} Valores)</span></p>
+            <div class="result-row">
+                <span class="result-label">Classificação Final do Plano Curricular (PC)</span>
+                <span class="result-value">{{ certificado.media_curricular }} ({{ certificado.media_curricular|floatformat:"0" }} Valores)</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Classificação da Prova de Aptidão Profissional (PAP)</span>
+                <span class="result-value">{{ certificado.prova_aptidao_profissional }} ({{ certificado.prova_aptidao_profissional_por_extenso|upper }}) Valores</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Classificação Final do Curso</span>
+                <span class="result-value">{{ certificado.classificacao_final }} ({{ certificado.classificacao_final|floatformat:"0" }} Valores)</span>
+            </div>
         </div>
 
         <!-- Rodapé do certificado -->
@@ -913,28 +1830,20 @@
     </div>
 
     <div class="signatures-container">
-        <div style="width: 45%; text-align: center;">
-            <div style="position: relative;">
-                <div class="signature">
-                    <p class="title">{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</p>
-                    <p class="subtitle">Directora do Instituto</p>
-                </div>
-                {% if certificado.diretor.assinatura %}
-                <img src="{{ certificado.diretor.assinatura.url }}" alt="Assinatura" style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 100px; height: 40px; object-fit: contain;">
-                {% endif %}
-            </div>
+        <div class="signature">
+            {% if certificado.diretor.assinatura %}
+            <img src="{{ certificado.diretor.assinatura.url }}" alt="Assinatura" class="signature-img">
+            {% endif %}
+            <p class="title">{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</p>
+            <p class="subtitle">Directora do Instituto</p>
         </div>
         
-        <div style="width: 45%; text-align: center;">
-            <div style="position: relative;">
-                <div class="signature">
-                    <p class="title">Mendes Antônio Dini</p>
-                    <p class="subtitle">Subdirector Pedagógico</p>
-                </div>
-                {% if certificado.subdirector.assinatura %}
-                <img src="{{ certificado.subdirector.assinatura.url }}" alt="Assinatura" style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 100px; height: 40px; object-fit: contain;">
-                {% endif %}
-            </div>
+        <div class="signature">
+            {% if certificado.subdirector.assinatura %}
+            <img src="{{ certificado.subdirector.assinatura.url }}" alt="Assinatura" class="signature-img">
+            {% endif %}
+            <p class="title">Mendes Antônio Dini</p>
+            <p class="subtitle">Subdirector Pedagógico</p>
         </div>
     </div>
 
@@ -957,12 +1866,18 @@
 </div>
 
 <script>
-    // Configurações adicionais para impressão
     document.addEventListener('DOMContentLoaded', function() {
-        // Adiciona um event listener para depois que a impressão terminar
-        window.addEventListener('afterprint', function() {
-            // Pode adicionar alguma lógica aqui se necessário
-            console.log('Impressão concluída ou cancelada');
+        // Garante que o conteúdo cabe em uma página
+        function adjustForPrint() {
+            const container = document.querySelector('.certificate-container');
+            if (container.scrollHeight > 297 * 3.78) { // 297mm em pixels (considerando 96dpi)
+                // Reduz o tamanho da fonte se necessário
+                document.body.style.fontSize = '11px';
+            }
+        }
+
+        window.addEventListener('beforeprint', function() {
+            adjustForPrint();
         });
     });
 </script>
