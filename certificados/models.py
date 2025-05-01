@@ -342,7 +342,7 @@ class Certificado(models.Model):
     ano_letivo = models.CharField(max_length=9, editable=False)
     
     diretor = models.ForeignKey('Usuario', on_delete=models.PROTECT, related_name='certificados_emitidos')
-    cargo_diretor = models.CharField(max_length=100, default='Directora do Instituto Politécnico Industrial do Calumbo')
+    cargo_de_direção = models.CharField(max_length=100, default='Directora do Instituto Politécnico Industrial do Calumbo')
     
     media_curricular = models.DecimalField(
         max_digits=4, 

@@ -99,7 +99,7 @@ class CertificadoAdmin(admin.ModelAdmin):
             'fields': ('data_emissao', 'ano_letivo')
         }),
         ('Direção', {
-            'fields': ('diretor', 'cargo_diretor')
+            'fields': ('diretor', 'cargo_de_direção')
         }),
         ('Resultados', {
             'fields': ('media_curricular', 'prova_aptidao_profissional', 'classificacao_final')
