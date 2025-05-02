@@ -1782,20 +1782,20 @@
             e o Subdirector Pedagógico <strong>Mendes Antônio Dinis</strong>, certificam de acordo com o artº 25º e 27º dos Estatutos do Subsistema 
             do Ensino Técnico Profissional, aprovado pelo Decreto nº 9004 de 3 de Dezembro de 2004, que 
             <strong style="color: red;">{{ certificado.matricula.aluno.nome_completo|upper }}</strong>, filho de 
-            <strong style="color: red;">{{ certificado.matricula.aluno.nome_pai|upper }}</strong> e de 
-            <strong style="color: red;">{{ certificado.matricula.aluno.nome_mae|upper }}</strong>, natural de 
-            <strong style="color: red;">{{ certificado.matricula.aluno.local_nascimento|upper }}</strong>, Província 
-            <strong style="color: red;">{{ certificado.matricula.aluno.get_provincia_display|upper }}</strong>, nascido aos 
-            <strong style="color: red;">{{ certificado.matricula.aluno.data_nascimento|date:"d/m/Y" }}</strong>, portador do 
-            <strong>{{ certificado.matricula.aluno.get_tipo_identificacao_display }} nº <span style="color: red;">{{ certificado.matricula.aluno.numero_identificacao }}</span></strong>, 
+            <strong>{{ certificado.matricula.aluno.nome_pai|upper }}</strong> e de 
+            <strong>{{ certificado.matricula.aluno.nome_mae|upper }}</strong>, natural de 
+            <strong>{{ certificado.matricula.aluno.local_nascimento|upper }}</strong>, Província 
+            <strong>{{ certificado.matricula.aluno.get_provincia_display|upper }}</strong>, nascido aos 
+            <strong>{{ certificado.matricula.aluno.data_nascimento|date:"d/m/Y" }}</strong>, portador do 
+            <strong>{{ certificado.matricula.aluno.get_tipo_identificacao_display }} nº <span>{{ certificado.matricula.aluno.numero_identificacao }}</span></strong>, 
             passado pelo <strong>{{ certificado.matricula.aluno.emissor_identificacao|upper }}</strong> aos 
-            <strong style="color: red;">{{ certificado.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}</strong>, 
-            <strong>CONCLUIU</strong style="color: red;"> em regime <strong>{{ certificado.matricula.get_turno_display|upper }}</strong>, no ano lectivo de 
-            <strong style="color: red;">{{ certificado.ano_letivo }}</strong> o curso de 
-            <strong style="color: red;">{{ certificado.matricula.curso.nome|upper }}</strong> na área de Formação de 
-            <strong style="color: red;">{{ certificado.matricula.curso.area_formacao.nome|upper }}</strong>, tendo obtido as seguintes 
-            classificações, conforme consta no processo individual nº <strong style="color: red;">{{ certificado.numero_processo }}</strong> e da folha nº 
-            <strong style="color: red;">010</strong> do Livro de Termos:
+            <strong>{{ certificado.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}</strong>, 
+            <strong>CONCLUIU</strong> em regime <strong>{{ certificado.matricula.get_turno_display|upper }}</strong>, no ano lectivo de 
+            <strong>{{ certificado.ano_letivo }}</strong> o curso de 
+            <strong>{{ certificado.matricula.curso.nome|upper }}</strong> na área de Formação de 
+            <strong>{{ certificado.matricula.curso.area_formacao.nome|upper }}</strong>, tendo obtido as seguintes 
+            classificações, conforme consta no processo individual nº <strong>{{ certificado.numero_processo }}</strong> e da folha nº 
+            <strong>010</strong> do Livro de Termos:
         </p>
         
         <!-- Disciplinas formatadas com alinhamento corrigido -->
