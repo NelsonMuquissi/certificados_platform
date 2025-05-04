@@ -50,21 +50,6 @@
             opacity: 0.5;
         }
 
-        .certificate-container::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 60px;
-            color: rgba(26, 60, 52, 0.08);
-            font-family: 'Playfair Display', serif;
-            text-transform: uppercase;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.6;
-        }
-
         .header {
             text-align: center;
             margin-bottom: 5px;
@@ -93,29 +78,44 @@
             margin-top: 3px;
         }
 
-        .title {
-            text-align: center;
-            margin: 11px 0;
+        .certificate-title {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-left: 10px;
+            margin-bottom: 15px;
         }
 
-        .title h2 {
+        .certificate-title img {
+            width: 80px;
+        }
+
+        .title-text {
+            margin-left: 70px;
+        }
+
+        .title-text h2 {
             margin: 0;
             font-size: 24px;
-            font-weight: 700;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Times New Roman', serif;
+            font-weight: bold;
+            color: #D4AF37;
             text-transform: uppercase;
-            color: #b71c1c;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
 
-        .title h3 {
-            margin: 6px 0 0 0;
+        .title-text h3 {
+            margin: 5px 0 0 0;
             font-size: 18px;
-            font-weight: 500;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Times New Roman', serif;
+            font-weight: bold;
+            color: #D4AF37;
             text-transform: uppercase;
-            color: #1a3c34;
+            letter-spacing: 0.5px;
         }
 
+        /* Restante do CSS permanece igual */
         .content {
             text-align: justify;
             line-height: 1.4;
@@ -369,16 +369,18 @@
         <h3>INSTITUTO POLITÉCNICO INDUSTRIAL Nº 2047 "17 DE DEZEMBRO"</h3>
     </div>
 
-    <!-- Título do certificado com tamanhos reduzidos -->
-    <div style="display: flex; justify-content: flex-start; align-items: center; margin-left: 20px;" class="title">
-        <img style="width: 80px;" src="{% static 'img/ipiz.png' %}" alt="">
-        <div style="margin-left: 70px;" class="info">
-            <h2>CERTIFICADO DE HABILITAÇÕES</h2>
-            <h3>Conclusão de Curso</h3>
+    <!-- Título do certificado com estilo atualizado -->
+    <div class="certificate-title">
+        <img src="{% static 'img/ipiz.png' %}" alt="Instituto Logo">
+        <div style="text-align: center;" class="title-text">
+            <i>
+                <h2>CERTIFICADO DE HABILITAÇÕES</h2>
+                <h3>CONCLUSÃO DE CURSO</h3>
+            </i>
         </div>
     </div>
 
-    <!-- Corpo do certificado -->
+    <!-- Restante do conteúdo permanece igual -->
     <div class="content">
         <p>
             A Directora do Instituto {{ certificado.cargo_diretor }}, <strong>{{ certificado.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</strong> 

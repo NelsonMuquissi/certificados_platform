@@ -1,6 +1,7 @@
+from django import forms
 from django.contrib import admin
 from django.db import IntegrityError
-from django.utils  import timezone
+from django.utils import timezone
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     Usuario, Aluno, AreaFormacao, Curso, Disciplina, 
@@ -8,6 +9,33 @@ from .models import (
     PedidoCorrecao, RegistroAuditoria, ConfiguracaoSistema
 )
 
+# Formulários devem vir primeiro
+class ResultadoDisciplinaForm(forms.ModelForm):
+    class Meta:
+        model = ResultadoDisciplina
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Filtra as disciplinas com base no curso do certificado, se existir
+        if self.instance and self.instance.certificado_id:
+            try:
+                certificado = Certificado.objects.get(pk=self.instance.certificado_id)
+                if certificado.matricula and certificado.matricula.curso:
+                    curso = certificado.matricula.curso
+                    # Obtém as disciplinas do curso através do modelo CursoDisciplina
+                    disciplinas_ids = CursoDisciplina.objects.filter(
+                        curso=curso
+                    ).values_list('disciplina_id', flat=True)
+                    
+                    self.fields['disciplina'].queryset = Disciplina.objects.filter(
+                        id__in=disciplinas_ids
+                    ).order_by('nome')
+            except Certificado.DoesNotExist:
+                pass
+            
+            
 class UsuarioAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'papel', 'is_staff', 'is_superuser')
     list_filter = ('papel', 'is_staff', 'is_superuser')
@@ -69,13 +97,40 @@ class MatriculaAdmin(admin.ModelAdmin):
 
 class ResultadoDisciplinaInline(admin.TabularInline):
     model = ResultadoDisciplina
-    extra = 1
-    autocomplete_fields = ['disciplina']
+    form = ResultadoDisciplinaForm
+    extra = 0  # Não mostrar linhas extras
     readonly_fields = ('nota_literal',)
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related('disciplina')
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        
+        # Se estiver criando um novo certificado ou editando um existente
+        if obj is not None:
+            # Verifica se já existem resultados para este certificado
+            existing_disciplinas = obj.resultados_disciplinas.values_list(
+                'disciplina_id', flat=True
+            )
+            
+            # Obtém todas as disciplinas do curso que ainda não foram adicionadas
+            curso_disciplinas = CursoDisciplina.objects.filter(
+                curso=obj.matricula.curso
+            ).exclude(
+                disciplina_id__in=existing_disciplinas
+            ).select_related('disciplina')
+            
+            # Adiciona automaticamente as disciplinas faltantes
+            for curso_disciplina in curso_disciplinas:
+                ResultadoDisciplina.objects.create(
+                    certificado=obj,
+                    disciplina=curso_disciplina.disciplina,
+                    nota_numerica=0.00  # Valor padrão
+                )
+        
+        return formset
 
 class CertificadoAdmin(admin.ModelAdmin):
     list_display = ('numero_certificado', 'numero_processo', 'matricula', 'data_emissao', 'classificacao_final', 'ativo')

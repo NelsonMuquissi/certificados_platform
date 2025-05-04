@@ -270,3 +270,6 @@ def verificar_certificado(request, identificador):
         'metodo_verificacao': metodo_verificacao,
         'valido': True
     })
+    
+def Erro(request, exception):
+    return render(request, 'error.html', status=404)
