@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dtua@0mme+%=selhk)_5hnom@7_kd$6^e_f#029#2dreq&7ufa'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['certificados-platform.onrender.com', 'localhost', '127.0.0.1']
 
@@ -144,21 +144,21 @@ USE_TZ = True
 AUTH_USER_MODEL = 'certificados.Usuario'
 BASE_URL = 'https://certificados-platform.onrender.com'
 # Diretório onde os arquivos estáticos serão armazenados
-STATIC_URL = '/static/'  # URL base para os arquivos estáticos
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Diretório no sistema de arquivos onde os arquivos estáticos coletados serão armazenados
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Usado no comando collectstatic
-
-# Diretórios adicionais onde o Django irá procurar por arquivos estáticos
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Diretório para armazenar arquivos estáticos adicionais
-]
-
-# URL base para os arquivos de mídia
+# Media files
 MEDIA_URL = '/media/'
-
-# Diretório no sistema de arquivos onde os arquivos de mídia serão armazenados
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# WhiteNoise configuration
+WHITENOISE_MAX_AGE = 31536000  # 1 year
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False
+
 
 
 # Default primary key field type
@@ -175,3 +175,14 @@ EMAIL_HOST_USER = 'emelsonmuquissi@gmail.com'
 EMAIL_HOST_PASSWORD = 'vizf hgju xsvn vrkx'
 DEFAULT_FROM_EMAIL = 'emelsonmuquissi@gmail.com'
 
+JAZZMIN_SETTINGS = {
+    "site_title": "Certificados Platform",
+    "site_header": "Certificados",
+    "site_brand": "Certificados Platform",
+    "welcome_sign": "Bem-vindo à administração",
+    "search_model": "auth.User",
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+    ],
+    "language_chooser": False,
+}
