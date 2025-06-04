@@ -34,6 +34,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="#declaracoes-section">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Minhas Declarações</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="#correcoes-section">
                             <i class="fas fa-edit"></i>
                             <span>Solicitar Correção</span>
@@ -42,7 +48,7 @@
                     <li>
                         <a href="#verificacao-section">
                             <i class="fas fa-check-circle"></i>
-                            <span>Verificar Certificado</span>
+                            <span>Verificar Documentos</span>
                         </a>
                     </li>
                     <li>
@@ -52,6 +58,7 @@
                         </a>
                     </li>
                 </ul>
+                
             </nav>
             
             <div class="sidebar-footer">
@@ -118,7 +125,7 @@
                                     <a href="{% url 'visualizar_certificado' certificado.id %}" class="btn btn-primary">
                                         <i class="fas fa-eye"></i> Visualizar Certificado
                                     </a>
-                                    <a href="{% url 'visualizar_certificado' certificado.id %}" class="btn btn-success">
+                                    <a href="{% url 'descarregar_certificado' certificado.id %}" class="btn btn-success">
                                         <i class="fas fa-download"></i> Baixar Certificado
                                     </a>
                                 </div>
@@ -135,6 +142,62 @@
                     {% endif %}
                 </div>
 
+                <!-- Seção de Declarações de Notas -->
+                <div id="declaracoes-section" class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-file-alt"></i> Minhas Declarações</h2>
+                    </div>
+                    
+                    {% if declaracoes %}
+                        <div class="declarations-container">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Número</th>
+                                            <th>Data de Emissão</th>
+                                            <th>Ano Letivo</th>
+                                            <th>Turma</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for declaracao in declaracoes %}
+                                        <tr>
+                                            <td>{{ declaracao.numero_processo }}</td>
+                                            <td>{{ declaracao.data_emissao|date:"d/m/Y" }}</td>
+                                            <td>{{ declaracao.ano_letivo }}</td>
+                                            <td>
+                                                <span class="badge bg-{% if declaracao.estado == 'VALIDO' %}success{% else %}warning{% endif %}">
+                                                    {{ declaracao.turma }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{% url 'visualizar_declaracao' declaracao.id %}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'descarregar_declaracao' declaracao.id %}" class="btn btn-sm btn-success">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                    <a href="{% url 'verificar_declaracao' declaracao.codigo_verificacao %}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Nenhuma declaração de notas encontrada.
+                        </div>
+                    {% endif %}
+                </div>
+
                 <!-- Seção de Solicitar Correção -->
                 <div id="correcoes-section" class="content-section">
                     <div class="section-header">
@@ -143,7 +206,7 @@
                     
                     {% if certificado %}
                         <div class="correction-info">
-                            <p>Caso encontre algum erro no seu certificado, você pode solicitar uma correção:</p>
+                            <p>Caso encontre algum erro no seu certificado ou declarações, você pode solicitar uma correção:</p>
                             
                             {% if pedidos_correcao %}
                                 <div class="correction-history">
@@ -175,6 +238,22 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="certificado_id" value="{{ certificado.id }}">
                                     <div class="form-group">
+                                        <label for="tipo_documento">Documento:</label>
+                                        <select class="form-control" id="tipo_documento" name="tipo_documento" required>
+                                            <option value="CERTIFICADO">Certificado</option>
+                                            <option value="DECLARACAO">Declaração de Notas</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mt-3">
+                                        <label for="documento_id">Selecione o documento:</label>
+                                        <select class="form-control" id="documento_id" name="documento_id" required>
+                                            <option value="{{ certificado.id }}">Certificado: {{ certificado.numero_certificado }}</option>
+                                            {% for declaracao in declaracoes %}
+                                                <option value="{{ declaracao.id }}">Declaração: {{ declaracao.numero_processo }} ({{ declaracao.semestre }}º Semestre)</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group mt-3">
                                         <label for="descricao">Descreva o erro encontrado:</label>
                                         <textarea class="form-control" id="descricao" name="descricao" rows="4" required></textarea>
                                     </div>
@@ -186,7 +265,7 @@
                         </div>
                     {% else %}
                         <div class="alert alert-info">
-                            Você precisa ter um certificado emitido para solicitar correções.
+                            Você precisa ter pelo menos um documento emitido para solicitar correções.
                         </div>
                     {% endif %}
                 </div>
@@ -194,21 +273,24 @@
                 <!-- Seção de Verificação -->
                 <div id="verificacao-section" class="content-section">
                     <div class="section-header">
-                        <h2><i class="fas fa-check-circle"></i> Verificar Certificado</h2>
+                        <h2><i class="fas fa-check-circle"></i> Verificar Documentos</h2>
                     </div>
                     
                     <div class="verification-container">
                         <div class="verification-info">
-                            <h3>Verifique a autenticidade do seu certificado</h3>
-                            <p>Use o código de verificação ou número de matrícula para confirmar a validade do certificado no sistema.</p>
+                            <h3>Verifique a autenticidade dos seus documentos</h3>
+                            <p>Use os códigos de verificação para confirmar a validade dos documentos no sistema.</p>
                             
                             <div class="verification-options">
                                 <div class="verification-method">
-                                    <h4><i class="fas fa-qrcode"></i> Código QR</h4>
+                                    <h4><i class="fas fa-certificate"></i> Verificar Certificado</h4>
                                     {% if certificado %}
-                                        <p>Escaneie o código QR no seu certificado ou use o código abaixo:</p>
-                                        <div class="verification-code">
-                                            {{ certificado.codigo_verificacao }}
+                                        <p>Use o código QR ou o número do certificado:</p>
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" value="{{ certificado.codigo_verificacao }}" id="certificate-code" readonly>
+                                            <button class="btn btn-outline-secondary" onclick="copyToClipboard('certificate-code')">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
                                         </div>
                                         <a href="{% url 'verificar_certificado' certificado.codigo_verificacao %}" class="btn btn-outline-primary">
                                             <i class="fas fa-search"></i> Verificar Agora
@@ -219,18 +301,21 @@
                                 </div>
                                 
                                 <div class="verification-method">
-                                    <h4><i class="fas fa-id-card"></i> Número de Matrícula</h4>
-                                    <p>Digite seu número de matrícula para verificação:</p>
-                                    {% if certificado %}
-                                        <form method="get" action="{% url 'verificar_certificado' certificado.numero_processo %}">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" name="matricula" placeholder="Número de Matrícula" 
-                                                    value="{% if matricula %}{{ matricula.numero_matricula }}{% endif %}">
-                                                <button class="btn btn-primary" type="submit">Verificar</button>
-                                            </div>
-                                        </form>
+                                    <h4><i class="fas fa-file-alt"></i> Verificar Declaração</h4>
+                                    {% if declaracoes %}
+                                        <p>Selecione uma declaração para verificar:</p>
+                                        <select class="form-select mb-3" id="declaration-select">
+                                            {% for declaracao in declaracoes %}
+                                                <option value="{{ declaracao.codigo_verificacao }}">
+                                                    Declaração {{ declaracao.numero_processo }} ({{ declaracao.ano_letivo }} Ano Letivo)
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <button class="btn btn-outline-primary" onclick="verifySelectedDeclaration()">
+                                            <i class="fas fa-search"></i> Verificar Selecionada
+                                        </button>
                                     {% else %}
-                                        <p>Nenhum certificado disponível para verificação.</p>
+                                        <p>Nenhuma declaração disponível para verificação.</p>
                                     {% endif %}
                                 </div>
                             </div>
@@ -369,6 +454,52 @@
                     }
                 });
             });
+        });
+
+        // Função para copiar código para área de transferência
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            
+            // Mostrar feedback visual
+            const originalText = element.nextElementSibling.innerHTML;
+            element.nextElementSibling.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+            setTimeout(() => {
+                element.nextElementSibling.innerHTML = originalText;
+            }, 2000);
+        }
+
+        // Função para verificar declaração selecionada
+        function verifySelectedDeclaration() {
+            const select = document.getElementById('declaration-select');
+            const code = select.value;
+            window.location.href = `/certificados/verificar-declaracao/${code}/`;
+        }
+
+        // Atualizar seleção de documentos para correção
+        document.getElementById('tipo_documento').addEventListener('change', function() {
+            const tipo = this.value;
+            const select = document.getElementById('documento_id');
+            const options = select.options;
+            
+            // Mostrar apenas os documentos do tipo selecionado
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (tipo === 'CERTIFICADO') {
+                    option.style.display = option.text.includes('Certificado') ? '' : 'none';
+                } else {
+                    option.style.display = option.text.includes('Declaração') ? '' : 'none';
+                }
+            }
+            
+            // Selecionar o primeiro visível
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].style.display !== 'none') {
+                    select.value = options[i].value;
+                    break;
+                }
+            }
         });
     </script>
 </body>

@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dtua@0mme+%=selhk)_5hnom@7_kd$6^e_f#029#2dreq&7ufa'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['certificados-platform.onrender.com', 'localhost', '127.0.0.1']
 
@@ -88,12 +88,13 @@ WSGI_APPLICATION = 'certificados_platform.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-"""DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}"""
+}
+"""
 
 DATABASES = {
     'default': {
@@ -104,7 +105,7 @@ DATABASES = {
         'HOST': 'dpg-d08c4es9c44c73bpv570-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
-}
+}"""
 
 
 # Password validation

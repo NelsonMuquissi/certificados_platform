@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
     Usuario, Aluno, AreaFormacao, Curso, Disciplina, 
     CursoDisciplina, Matricula, Certificado, ResultadoDisciplina,
-    PedidoCorrecao, RegistroAuditoria, ConfiguracaoSistema
+    PedidoCorrecao, RegistroAuditoria, ConfiguracaoSistema,ResultadoDeclaracao, DeclaracaoNotas
 )
 
 # Formulários devem vir primeiro
@@ -243,6 +243,98 @@ class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+class ResultadoDeclaracaoInline(admin.TabularInline):
+    model = ResultadoDeclaracao
+    extra = 0
+    autocomplete_fields = ['disciplina']
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('disciplina')
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        
+        # Se estiver criando uma nova declaração ou editando uma existente
+        if obj is not None:
+            # Verifica se já existem resultados para esta declaração
+            existing_disciplinas = obj.resultados.values_list(
+                'disciplina_id', flat=True
+            )
+            
+            # Obtém todas as disciplinas do curso que ainda não foram adicionadas
+            curso_disciplinas = CursoDisciplina.objects.filter(
+                curso=obj.matricula.curso
+            ).exclude(
+                disciplina_id__in=existing_disciplinas
+            ).select_related('disciplina')
+            
+            # Adiciona automaticamente as disciplinas faltantes
+            for curso_disciplina in curso_disciplinas:
+                ResultadoDeclaracao.objects.create(
+                    declaracao=obj,
+                    disciplina=curso_disciplina.disciplina,
+                    nota_numerica=0.00  # Valor padrão
+                )
+        
+        return formset
+
+class DeclaracaoNotasAdmin(admin.ModelAdmin):
+    list_display = ('numero_processo', 'matricula', 'ano_letivo', 'turma', 'data_emissao', 'carimbo_oleo')
+    list_filter = ('ano_letivo', 'turma', 'carimbo_oleo')
+    search_fields = ('numero_processo', 'matricula__aluno__nome_completo')
+    
+    readonly_fields = (
+        'numero_processo', 'ano_letivo', 'codigo_verificacao', 
+        'qr_code_preview', 'data_criacao', 'atualizado_em'
+    )
+    
+    autocomplete_fields = ['matricula', 'emitido_por']
+    inlines = [ResultadoDeclaracaoInline]
+    
+    fieldsets = (
+        ('Identificação', {
+            'fields': ('matricula', 'numero_processo', 'ano_letivo', 'turma')
+        }),
+        ('Emissão', {
+            'fields': ('data_emissao', 'emitido_por', 'carimbo_oleo')
+        }),
+        ('Verificação', {
+            'fields': ('codigo_verificacao', 'qr_code_preview')
+        }),
+        ('Metadados', {
+            'fields': ('data_criacao', 'atualizado_em'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def qr_code_preview(self, obj):
+        if obj.qr_code:
+            return f'<img src="{obj.qr_code.url}" style="max-height: 150px;" />'
+        return "Nenhum QR Code gerado"
+    qr_code_preview.allow_tags = True
+    qr_code_preview.short_description = 'QR Code'
+    
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:  # Nova declaração
+            if not obj.numero_processo and hasattr(obj, 'matricula'):
+                obj.numero_processo = obj.matricula.numero_matricula
+            if not obj.ano_letivo and hasattr(obj, 'matricula'):
+                obj.ano_letivo = obj.matricula.ano_letivo
+        
+        super().save_model(request, obj, form, change)
+        
+        # Garante que o QR code seja gerado
+        if not obj.qr_code:
+            obj.gerar_qr_code()
+            obj.save()
+
+class ResultadoDeclaracaoAdmin(admin.ModelAdmin):
+    list_display = ('declaracao', 'disciplina', 'nota_numerica')
+    list_filter = ('disciplina',)
+    search_fields = ('declaracao__numero_processo', 'disciplina__nome')
+    autocomplete_fields = ['declaracao', 'disciplina']
+
 # Registro dos modelos
 admin.site.register(Usuario, UsuarioAdmin)
 admin.site.register(Aluno, AlunoAdmin)
@@ -254,3 +346,5 @@ admin.site.register(Certificado, CertificadoAdmin)
 admin.site.register(PedidoCorrecao, PedidoCorrecaoAdmin)
 admin.site.register(RegistroAuditoria, RegistroAuditoriaAdmin)
 admin.site.register(ConfiguracaoSistema, ConfiguracaoSistemaAdmin)
+admin.site.register(DeclaracaoNotas, DeclaracaoNotasAdmin)
+admin.site.register(ResultadoDeclaracao, ResultadoDeclaracaoAdmin)

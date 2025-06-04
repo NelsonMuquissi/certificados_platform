@@ -99,9 +99,6 @@ class Usuario(AbstractUser):
     def has_perm(self, perm, obj=None):
         return self.is_staff or self.papel in ['ADMIN', 'SECRETARIA', 'DIRECAO']
 
-from datetime import date
-from django.core.exceptions import ValidationError
-from django.contrib.auth.hashers import make_password
 
 class Aluno(models.Model):
     SEXO_CHOICES = (
@@ -199,45 +196,218 @@ class Aluno(models.Model):
 
     def enviar_email_boas_vindas(self):
         try:
-            assunto = "Bem-vindo ao IPIC - Sua Jornada Começa Aqui!"
-            mensagem = f'''
+            assunto = "🎉 Bem-vindo ao IPIZ - Sua Jornada Começa Aqui!"
+            
+            # Mensagem HTML formatada
+            mensagem_html = f"""
+            <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 20px;
+                    }}
+                    .header {{
+                        background-color: #0056b3;
+                        color: white;
+                        padding: 20px;
+                        text-align: center;
+                        border-radius: 5px 5px 0 0;
+                    }}
+                    .welcome-icon {{
+                        font-size: 48px;
+                        margin-bottom: 15px;
+                    }}
+                    .content {{
+                        padding: 20px;
+                        background-color: #f9f9f9;
+                        border-radius: 0 0 5px 5px;
+                    }}
+                    .credentials {{
+                        background-color: white;
+                        border: 1px solid #e0e0e0;
+                        border-left: 4px solid #0056b3;
+                        padding: 15px;
+                        margin: 20px 0;
+                    }}
+                    .credential-item {{
+                        margin-bottom: 10px;
+                        display: flex;
+                        align-items: center;
+                    }}
+                    .icon {{
+                        margin-right: 10px;
+                        color: #0056b3;
+                        width: 20px;
+                        text-align: center;
+                    }}
+                    .steps {{
+                        margin: 20px 0;
+                        padding-left: 20px;
+                    }}
+                    .step {{
+                        margin-bottom: 10px;
+                        position: relative;
+                        padding-left: 30px;
+                    }}
+                    .step-number {{
+                        position: absolute;
+                        left: 0;
+                        background-color: #0056b3;
+                        color: white;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        text-align: center;
+                        line-height: 20px;
+                        font-size: 12px;
+                    }}
+                    .button {{
+                        display: inline-block;
+                        background-color: #0056b3;
+                        color: white;
+                        padding: 12px 25px;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        margin: 15px 0;
+                        font-weight: bold;
+                    }}
+                    .contact {{
+                        margin-top: 25px;
+                        padding-top: 15px;
+                        border-top: 1px solid #e0e0e0;
+                    }}
+                    .footer {{
+                        margin-top: 20px;
+                        font-size: 0.9em;
+                        color: #666;
+                        text-align: center;
+                    }}
+                    .highlight {{
+                        background-color: #fff8e1;
+                        padding: 2px 5px;
+                        border-radius: 3px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="welcome-icon">🎓</div>
+                    <h2 style="margin:0;">Bem-vindo ao IPIZ!</h2>
+                    <p style="margin:5px 0 0;font-size:0.9em;">Instituto Politécnico Industrial do Zango</p>
+                </div>
+                
+                <div class="content">
+                    <p>Olá <strong>{self.nome_completo}</strong>,</p>
+                    
+                    <p>É com grande alegria que damos as boas-vindas ao <strong>Instituto Politécnico Industrial do Zango</strong>!</p>
+                    
+                    <p>Estamos entusiasmados por você fazer parte da nossa comunidade acadêmica e comprometidos com o seu sucesso.</p>
+                    
+                    <div class="credentials">
+                        <h3 style="margin-top:0;color:#0056b3;">📋 Suas Credenciais de Acesso</h3>
+                        
+                        <div class="credential-item">
+                            <span class="icon">📧</span>
+                            <span><strong>Email:</strong> {self.email}</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="icon">🔑</span>
+                            <span><strong>Senha inicial:</strong> <span class="highlight">Seu número de documento ({self.numero_identificacao})</span></span>
+                        </div>
+                    </div>
+                    
+                    <h3 style="color:#0056b3;">📝 Primeiros Passos Recomendados</h3>
+                    
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <strong>Acesse o sistema</strong> o quanto antes para conhecer a plataforma
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <strong>Altere sua senha</strong> para uma combinação mais segura
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <strong>Complete seu perfil acadêmico</strong> com suas informações atualizadas
+                        </div>
+                    </div>
+                    
+                    <p style="text-align:center;">
+                        <a style="color:#fff" href="{settings.BASE_URL}" class="button">Acessar a Plataforma</a>
+                    </p>
+                    
+                    <div class="contact">
+                        <h3 style="color:#0056b3;margin-top:0;">📞 Precisa de Ajuda?</h3>
+                        <p>Nossa equipe de suporte está pronta para auxiliá-lo:</p>
+                        <div class="credential-item">
+                            <span class="icon">✉️</span>
+                            <span><strong>Email:</strong> suporte@ipiz.ed.ao</span>
+                        </div>
+                        <div class="credential-item">
+                            <span class="icon">📱</span>
+                            <span><strong>Telefone:</strong> +244 936 327 119</span>
+                        </div>
+                    </div>
+                    
+                    <p>Estamos à disposição para apoiar sua jornada acadêmica!</p>
+                </div>
+                
+                <div class="footer">
+                    <p>© {timezone.now().year} IPIZ - Instituto Politécnico Industrial do Zango</p>
+                    <p>Este é um email automático, por favor não responda.</p>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Versão alternativa em texto simples
+            mensagem_texto = f"""
             Olá {self.nome_completo}!
 
-            Seja muito bem-vindo(a) ao Instituto Politécnico Industrial do Calumbo!
+            Seja muito bem-vindo(a) ao Instituto Politécnico Industrial do Zango!
 
-            Estamos muito felizes por você fazer parte da nossa comunidade acadêmica. 
-            Aqui estão suas credenciais de acesso à plataforma:
+            ========== SUAS CREDENCIAIS ==========
+            Email: {self.email}
+            Senha inicial: Seu número de documento ({self.numero_identificacao})
+            ======================================
 
-            - Email: {self.email}
-            - Senha inicial: Seu número de documento ({self.numero_identificacao})
-            
-            Recomendamos que:
+            RECOMENDAÇÕES IMPORTANTES:
             1. Acesse o sistema o quanto antes
             2. Altere sua senha para uma mais segura
             3. Complete seu perfil acadêmico
 
-            Acesse nossa plataforma em: {settings.BASE_URL}
+            ACESSO À PLATAFORMA:
+            {settings.BASE_URL}
 
-            Em caso de dúvidas, entre em contato com nossa equipe de suporte:
-            Email: suporte@ipic.ed.ao
+            SUPORTE TÉCNICO:
+            Email: suporte@ipiz.ed.ao
             Telefone: +244 936 327 119
 
             Estamos à disposição para apoiar seu sucesso acadêmico!
 
             Atenciosamente,
             Direção Acadêmica
-            IPIC - Instituto Politécnico Industrial do Calumbo
-            '''
+            IPIZ - Instituto Politécnico Industrial do Zango
+            """
             
             send_mail(
                 assunto,
-                mensagem,
+                mensagem_texto,
                 settings.EMAIL_HOST_USER,
                 [self.email],
+                html_message=mensagem_html,
                 fail_silently=False,
             )
         except Exception as e:
-            # Re-lança a exceção para ser capturada no método save
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Falha ao enviar email de boas-vindas: {str(e)}", exc_info=True)
             raise
 
 class AreaFormacao(models.Model):
@@ -484,46 +654,181 @@ class Certificado(models.Model):
                 logger = logging.getLogger(__name__)
                 logger.error(f"Falha ao enviar email de certificado: {str(e)}", exc_info=True)
 
-        def enviar_email_certificado(self):
-            try:
-                aluno = self.matricula.aluno
-                assunto = "Seu Certificado foi Emitido - IPIC"
-                mensagem = f'''
-                Prezado(a) {aluno.nome_completo},
-
-                É com grande satisfação que informamos que seu certificado foi emitido com sucesso!
-
-                Detalhes do Certificado:
-                - Número: {self.numero_certificado}
-                - Curso: {self.matricula.curso.nome}
-                - Data de Emissão: {self.data_emissao.strftime('%d/%m/%Y')}
-                - Classificação Final: {self.classificacao_final}
-
-                Seu certificado pode ser verificado a qualquer momento usando o código único:
-                {self.codigo_verificacao}
-
-                Ou através do QR Code disponível no documento.
-
-                Este certificado representa a conclusão bem-sucedida de seu curso e está disponível 
-                para download em sua área do aluno.
-
-                Parabéns por esta conquista importante!
-
-                Atenciosamente,
-                Direção Acadêmica
-                IPIC - Instituto Politécnico Industrial do Calumbo
-                '''
+    def enviar_email_certificado(self):
+        try:
+            aluno = self.matricula.aluno
+            assunto = "🎓 Seu Certificado foi Emitido - IPIZ"
+            
+            # Mensagem HTML formatada
+            mensagem_html = f"""
+            <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 20px;
+                    }}
+                    .header {{
+                        background-color: #28a745;
+                        color: white;
+                        padding: 15px;
+                        text-align: center;
+                        border-radius: 5px 5px 0 0;
+                    }}
+                    .content {{
+                        padding: 20px;
+                        background-color: #f9f9f9;
+                        border-radius: 0 0 5px 5px;
+                    }}
+                    .details {{
+                        background-color: white;
+                        border-left: 4px solid #28a745;
+                        padding: 15px;
+                        margin: 15px 0;
+                    }}
+                    .detail-item {{
+                        margin-bottom: 10px;
+                        display: flex;
+                        align-items: center;
+                    }}
+                    .icon {{
+                        margin-right: 10px;
+                        color: #28a745;
+                        width: 20px;
+                        text-align: center;
+                    }}
+                    .footer {{
+                        margin-top: 20px;
+                        font-size: 0.9em;
+                        color: #666;
+                        text-align: center;
+                    }}
+                    .verification-code {{
+                        background-color: #e6ffed;
+                        padding: 10px;
+                        border-radius: 5px;
+                        font-family: monospace;
+                        text-align: center;
+                        margin: 15px 0;
+                        font-weight: bold;
+                    }}
+                    .button {{
+                        display: inline-block;
+                        background-color: #28a745;
+                        color: white;
+                        padding: 10px 20px;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        margin: 10px 0;
+                    }}
+                    .congrats {{
+                        font-size: 1.2em;
+                        color: #28a745;
+                        font-weight: bold;
+                        text-align: center;
+                        margin: 15px 0;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h2 style="margin:0;">IPIZ - Instituto Politécnico Industrial do Zango</h2>
+                </div>
                 
-                send_mail(
-                    assunto,
-                    mensagem,
-                    settings.EMAIL_HOST_USER,
-                    [aluno.email],
-                    fail_silently=False,
-                )
-            except Exception as e:
-                # Re-lança a exceção para ser capturada no método save
-                raise
+                <div class="content">
+                    <p>Prezado(a) <strong>{aluno.nome_completo}</strong>,</p>
+                    
+                    <div class="congrats">
+                        🎉 Parabéns! Seu certificado foi emitido com sucesso! 🎉
+                    </div>
+                    
+                    <div class="details">
+                        <div class="detail-item">
+                            <span class="icon">📜</span>
+                            <span><strong>Número do Certificado:</strong> {self.numero_certificado}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="icon">📚</span>
+                            <span><strong>Curso:</strong> {self.matricula.curso.nome}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="icon">📅</span>
+                            <span><strong>Data de Emissão:</strong> {self.data_emissao.strftime('%d/%m/%Y')}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="icon">🏆</span>
+                            <span><strong>Classificação Final:</strong> {self.classificacao_final}</span>
+                        </div>
+                    </div>
+                    
+                    <p>Este certificado representa a conclusão bem-sucedida de seu curso no IPIZ. Você pode verificar sua autenticidade a qualquer momento usando:</p>
+                    
+                    <div class="verification-code">
+                        <div style="margin-bottom:5px;">🔒 Código de Verificação:</div>
+                        {self.codigo_verificacao}
+                    </div>
+                    
+                    <p style="text-align:center;">
+                        <a style="color:#fff;" href="{settings.BASE_URL}/certificados/painel-aluno/" class="button">Acessar Área do Aluno</a>
+                    </p>
+                    
+                    <p>Seu certificado está disponível para download em sua área do aluno, juntamente com o QR Code para verificação.</p>
+                    
+                    <p style="font-style:italic; text-align:center;">
+                        "O conhecimento é a chave para abrir as portas do futuro."
+                    </p>
+                </div>
+                
+                <div class="footer">
+                    <p>© {timezone.now().year} IPIZ - Instituto Politécnico Industrial do Zango</p>
+                    <p>Este é um email automático, por favor não responda.</p>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Versão alternativa em texto simples
+            mensagem_texto = f"""
+            Prezado(a) {aluno.nome_completo},
+
+            🎉 Parabéns! Seu certificado foi emitido com sucesso! 🎉
+
+            Detalhes do Certificado:
+            - Número: {self.numero_certificado}
+            - Curso: {self.matricula.curso.nome}
+            - Data de Emissão: {self.data_emissao.strftime('%d/%m/%Y')}
+            - Classificação Final: {self.classificacao_final}
+
+            Código de Verificação: {self.codigo_verificacao}
+
+            Este certificado representa a conclusão bem-sucedida de seu curso no IPIZ.
+
+            Acesse sua área do aluno em: {settings.BASE_URL}/certificados/painel-aluno/
+
+            "O conhecimento é a chave para abrir as portas do futuro."
+
+            Atenciosamente,
+            Direção Acadêmica
+            IPIZ - Instituto Politécnico Industrial do Zango
+            """
+            
+            send_mail(
+                assunto,
+                mensagem_texto,
+                settings.EMAIL_HOST_USER,
+                [aluno.email],
+                html_message=mensagem_html,
+                fail_silently=False,
+            )
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Falha ao enviar email de certificado: {str(e)}", exc_info=True)
+            raise
     # Métodos para notas por extenso
     def get_nota_formatada(self, valor):
         """Formata a nota como inteiro, arredondando corretamente"""
@@ -701,3 +1006,258 @@ class Notificacao(models.Model):
     
     def __str__(self):
         return f"Notificação para {self.usuario}: {self.mensagem[:50]}..."
+
+
+class DeclaracaoNotas(models.Model):
+    matricula = models.ForeignKey(Matricula, on_delete=models.PROTECT, related_name='declaracoes')
+    numero_processo = models.CharField(max_length=20)
+    ano_letivo = models.CharField(max_length=9, default="2024-2025")
+    turma = models.CharField(max_length=20, default="TI12AD", unique=True)
+    codigo_verificacao = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    qr_code = models.ImageField(upload_to='qrcodes_declaracoes/', blank=True)
+    data_emissao = models.DateField(default=timezone.now)
+    emitido_por = models.ForeignKey(Usuario, on_delete=models.PROTECT)
+    carimbo_oleo = models.BooleanField(default=True, 
+        help_text="Indica se a declaração foi autenticada com carimbo à óleo")
+    
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Declaração de Notas'
+        verbose_name_plural = 'Declarações de Notas'
+        ordering = ['-data_emissao']
+    
+    def __str__(self):
+        return f"Declaração de Notas - {self.matricula.aluno} ({self.ano_letivo})"
+    
+    def gerar_qr_code(self):
+        url = f"{settings.BASE_URL}/certificados/verificar-declaracao/{self.codigo_verificacao}/"
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(url)
+        qr.make(fit=True)
+        
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        nome_arquivo = f'declaracao_{self.codigo_verificacao}.png'
+        
+        self.qr_code.save(nome_arquivo, File(buffer), save=False)
+    
+    def enviar_email_declaracao(self):
+            try:
+                aluno = self.matricula.aluno
+                assunto = "📄 Sua Declaração de Notas foi Emitida - IPIZ"
+                
+                # Mensagem HTML formatada
+                mensagem_html = f"""
+                <html>
+                <head>
+                    <style>
+                        body {{
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                            max-width: 600px;
+                            margin: 0 auto;
+                            padding: 20px;
+                        }}
+                        .header {{
+                            background-color: #0056b3;
+                            color: white;
+                            padding: 15px;
+                            text-align: center;
+                            border-radius: 5px 5px 0 0;
+                        }}
+                        .content {{
+                            padding: 20px;
+                            background-color: #f9f9f9;
+                            border-radius: 0 0 5px 5px;
+                        }}
+                        .details {{
+                            background-color: white;
+                            border-left: 4px solid #0056b3;
+                            padding: 15px;
+                            margin: 15px 0;
+                        }}
+                        .detail-item {{
+                            margin-bottom: 10px;
+                            display: flex;
+                            align-items: center;
+                        }}
+                        .icon {{
+                            margin-right: 10px;
+                            color: #0056b3;
+                            width: 20px;
+                            text-align: center;
+                        }}
+                        .footer {{
+                            margin-top: 20px;
+                            font-size: 0.9em;
+                            color: #666;
+                            text-align: center;
+                        }}
+                        .verification-code {{
+                            background-color: #f0f7ff;
+                            padding: 10px;
+                            border-radius: 5px;
+                            font-family: monospace;
+                            text-align: center;
+                            margin: 15px 0;
+                            font-weight: bold;
+                        }}
+                        .button {{
+                            display: inline-block;
+                            background-color: #0056b3;
+                            color: white;
+                            padding: 10px 20px;
+                            text-decoration: none;
+                            border-radius: 5px;
+                            margin: 10px 0;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2 style="margin:0;">IPIZ - Instituto Politécnico Industrial do Zango</h2>
+                    </div>
+                    
+                    <div class="content">
+                        <p>Prezado(a) <strong>{aluno.nome_completo}</strong>,</p>
+                        
+                        <p style="font-size:1.1em;">Sua declaração de notas foi emitida com sucesso! 🎓</p>
+                        
+                        <div class="details">
+                            <div class="detail-item">
+                                <span class="icon">📋</span>
+                                <span><strong>Número do Processo:</strong> {self.numero_processo}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="icon">📅</span>
+                                <span><strong>Ano Letivo:</strong> {self.ano_letivo}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="icon">👥</span>
+                                <span><strong>Turma:</strong> {self.turma}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="icon">📆</span>
+                                <span><strong>Data de Emissão:</strong> {self.data_emissao.strftime('%d/%m/%Y')}</span>
+                            </div>
+                        </div>
+                        
+                        <p>Você pode verificar a autenticidade desta declaração a qualquer momento usando:</p>
+                        
+                        <div class="verification-code">
+                            <div style="margin-bottom:5px;">🔒 Código de Verificação:</div>
+                            {self.codigo_verificacao}
+                        </div>
+                        
+                        <p style="text-align:center;">
+                            <a style="color:#fff;" href="{settings.BASE_URL}/painel-aluno/" class="button">Acessar Área do Aluno</a>
+                        </p>
+                        
+                        <p>Esta declaração também está disponível para download em sua área do aluno, juntamente com o QR Code para verificação.</p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p>© {timezone.now().year} IPIZ - Instituto Politécnico Industrial do Zango</p>
+                        <p>Este é um email automático, por favor não responda.</p>
+                    </div>
+                </body>
+                </html>
+                """
+                
+                # Versão alternativa em texto simples
+                mensagem_texto = f"""
+                Prezado(a) {aluno.nome_completo},
+
+                Sua declaração de notas foi emitida com sucesso!
+
+                Detalhes da Declaração:
+                - Número do Processo: {self.numero_processo}
+                - Ano Letivo: {self.ano_letivo}
+                - Turma: {self.turma}
+                - Data de Emissão: {self.data_emissao.strftime('%d/%m/%Y')}
+                
+                Código de Verificação: {self.codigo_verificacao}
+
+                Acesse sua área do aluno em: {settings.BASE_URL}/certificados/painel-aluno/
+
+                Atenciosamente,
+                Secretaria Acadêmica
+                IPIZ - Instituto Politécnico Industrial do Zango
+                """
+                
+                send_mail(
+                    assunto,
+                    mensagem_texto,
+                    settings.EMAIL_HOST_USER,
+                    [aluno.email],
+                    html_message=mensagem_html,
+                    fail_silently=False,
+                )
+            
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Falha ao enviar email de declaração: {str(e)}", exc_info=True)
+                raise
+    
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        
+        if not self.numero_processo and hasattr(self, 'matricula'):
+            self.numero_processo = self.matricula.numero_matricula
+        
+        if not self.ano_letivo and hasattr(self, 'matricula'):
+            self.ano_letivo = self.matricula.ano_letivo
+        
+        if not self.qr_code:
+            self.gerar_qr_code()
+            
+        super().save(*args, **kwargs)
+            
+        # Envia email apenas para novas declarações
+        if is_new and hasattr(self, 'matricula') and hasattr(self.matricula, 'aluno'):
+            try:
+                self.enviar_email_declaracao()
+            except Exception as e:
+                # Captura qualquer erro no envio de email e registra, mas não interrompe
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Falha ao enviar email de declaração: {str(e)}", exc_info=True)
+
+
+class ResultadoDeclaracao(models.Model):
+    declaracao = models.ForeignKey(DeclaracaoNotas, on_delete=models.CASCADE, related_name='resultados')
+    disciplina = models.ForeignKey(Disciplina, on_delete=models.PROTECT)
+    nota_numerica = models.DecimalField(
+        max_digits=4, 
+        decimal_places=2,
+        validators=[MinValueValidator(0), MaxValueValidator(20)]
+    )
+    
+    class Meta:
+        unique_together = ('declaracao', 'disciplina')
+        ordering = ['disciplina__nome']
+        verbose_name = 'Resultado na Declaração'
+        verbose_name_plural = 'Resultados na Declaração'
+    
+    def __str__(self):
+        return f"{self.disciplina}: {self.nota_numerica}"
+    
+    def get_nota_formatada(self):
+        """Formata a nota como inteiro (14 valores) como no exemplo"""
+        try:
+            nota = Decimal(str(self.nota_numerica)).quantize(
+                Decimal('1'), rounding=ROUND_HALF_UP
+            )
+            return f"({int(nota)})valores"
+        except:
+            return "(0)valores"

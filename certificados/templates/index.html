@@ -342,63 +342,68 @@
                 <div class="col-lg-8">
                     <div class="verification-box">
                         <div class="text-center mb-4">
-                            <h2 class="fw-bold mb-3">Verificar Certificado</h2>
-                            <p class="text-muted">Insira o código de verificação <strong>ou número de matrícula</strong> para validar a autenticidade do documento</p>
+                            <h2 class="fw-bold mb-3">Verificar Documentos</h2>
+                            <p class="text-muted">Insira o código de verificação <strong>ou número de matrícula/processo</strong> para validar a autenticidade</p>
                         </div>
                         
-                        <form id="certificadoForm" class="row g-3">
-                            <div class="col-md-9">
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white"><i class="fas fa-key text-primary"></i></span>
-                                    <input type="text" id="codigoInput" name="codigo_verificacao" class="form-control" 
-                                           placeholder="Ex: b17979de-2054-4d78-bed5-e1bcf435e253 ou I1" required>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <button type="button" onclick="verificarCertificado()" class="btn btn-primary btn-lg w-100 h-100">
-                                    <i class="fas fa-search me-2"></i> Verificar
+                        <!-- Abas para escolher entre Certificado e Declaração -->
+                        <ul class="nav nav-tabs nav-fill mb-4" id="verificationTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="certificado-tab" data-bs-toggle="tab" data-bs-target="#certificado-tab-pane" type="button" role="tab">
+                                    <i class="fas fa-certificate me-2"></i> Certificado
                                 </button>
-                            </div>
-                        </form>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="declaracao-tab" data-bs-toggle="tab" data-bs-target="#declaracao-tab-pane" type="button" role="tab">
+                                    <i class="fas fa-file-alt me-2"></i> Declaração
+                                </button>
+                            </li>
+                        </ul>
                         
-                        <script>
-                        function verificarCertificado() {
-                            const codigo = document.getElementById('codigoInput').value.trim();
+                        <div class="tab-content" id="verificationTabsContent">
+                            <!-- Tab Certificado -->
+                            <div class="tab-pane fade show active" id="certificado-tab-pane" role="tabpanel">
+                                <form id="certificadoForm" class="row g-3">
+                                    <div class="col-md-9">
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-white"><i class="fas fa-key text-primary"></i></span>
+                                            <input type="text" id="certificadoInput" name="codigo_verificacao" class="form-control" 
+                                                placeholder="Ex: b17979de-2054-4d78-bed5-e1bcf435e253 ou I1" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="button" onclick="verificarCertificado()" class="btn btn-primary btn-lg w-100 h-100">
+                                            <i class="fas fa-search me-2"></i> Verificar
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                             
-                            // Remove qualquer mensagem de erro anterior
-                            const errorElement = document.getElementById('verificationError');
-                            if (errorElement) {
-                                errorElement.remove();
-                            }
-                            
-                            // Verifica se o campo não está vazio
-                            if (!codigo) {
-                                showError('Por favor, insira um código de verificação ou número de matrícula');
-                                return;
-                            }
-                            
-                            // Se chegou aqui, pode tentar verificar
-                            window.location.href = `/certificados/verificar/${codigo}/`;
-                        }
-    
-                        function showError(message) {
-                            const form = document.getElementById('certificadoForm');
-                            const errorDiv = document.createElement('div');
-                            errorDiv.id = 'verificationError';
-                            errorDiv.className = 'alert alert-danger mt-3';
-                            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
-                            
-                            // Insere após o formulário
-                            form.parentNode.insertBefore(errorDiv, form.nextSibling);
-                        }
-                        </script>
+                            <!-- Tab Declaração -->
+                            <div class="tab-pane fade" id="declaracao-tab-pane" role="tabpanel">
+                                <form id="declaracaoForm" class="row g-3">
+                                    <div class="col-md-9">
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-white"><i class="fas fa-key text-primary"></i></span>
+                                            <input type="text" id="declaracaoInput" name="codigo_verificacao" class="form-control" 
+                                                placeholder="Ex: 8a3b5c7d-... ou DP-2023-001" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="button" onclick="verificarDeclaracao()" class="btn btn-primary btn-lg w-100 h-100">
+                                            <i class="fas fa-search me-2"></i> Verificar
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                         
                         <div class="mt-4 text-center">
                             <p class="text-muted mb-3">Métodos de verificação disponíveis:</p>
                             <div class="d-flex justify-content-center flex-wrap gap-3">
                                 <div class="text-center">
                                     <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
-                                         style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
+                                        style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
                                         <i class="fas fa-qrcode text-primary"></i>
                                     </div>
                                     <small class="d-block mt-2">Código QR</small>
@@ -406,19 +411,19 @@
                                 </div>
                                 <div class="text-center">
                                     <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
-                                         style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
+                                        style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
                                         <i class="fas fa-id-card text-primary"></i>
                                     </div>
                                     <small class="d-block mt-2">Nº Matrícula</small>
-                                    <small class="text-muted">(ex: I1)</small>
+                                    <small class="text-muted">(Certificados)</small>
                                 </div>
                                 <div class="text-center">
                                     <div class="bg-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
-                                         style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
-                                        <i class="fas fa-key text-primary"></i>
+                                        style="width: 50px; height: 50px; border: 2px solid var(--primary-color);">
+                                        <i class="fas fa-file-alt text-primary"></i>
                                     </div>
-                                    <small class="d-block mt-2">Código UUID</small>
-                                    <small class="text-muted">(ex: b17979de-...)</small>
+                                    <small class="d-block mt-2">Nº Processo</small>
+                                    <small class="text-muted">(Declarações)</small>
                                 </div>
                             </div>
                         </div>
@@ -427,6 +432,57 @@
             </div>
         </div>
     </section>
+
+    <script>
+    function verificarCertificado() {
+        const codigo = document.getElementById('certificadoInput').value.trim();
+        
+        // Remove qualquer mensagem de erro anterior
+        const errorElement = document.getElementById('verificationError');
+        if (errorElement) {
+            errorElement.remove();
+        }
+        
+        // Verifica se o campo não está vazio
+        if (!codigo) {
+            showError('Por favor, insira um código de verificação ou número de matrícula');
+            return;
+        }
+        
+        // Se chegou aqui, pode tentar verificar
+        window.location.href = `/certificados/verificar/${codigo}/`;
+    }
+
+    function verificarDeclaracao() {
+        const codigo = document.getElementById('declaracaoInput').value.trim();
+        
+        // Remove qualquer mensagem de erro anterior
+        const errorElement = document.getElementById('verificationError');
+        if (errorElement) {
+            errorElement.remove();
+        }
+        
+        // Verifica se o campo não está vazio
+        if (!codigo) {
+            showError('Por favor, insira um código de verificação ou número de processo');
+            return;
+        }
+        
+        // Se chegou aqui, pode tentar verificar
+        window.location.href = `/certificados/verificar-declaracao/${codigo}/`;
+    }
+
+    function showError(message) {
+        const form = document.getElementById('certificadoForm');
+        const errorDiv = document.createElement('div');
+        errorDiv.id = 'verificationError';
+        errorDiv.className = 'alert alert-danger mt-3';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
+        
+        // Insere após o formulário
+        form.parentNode.insertBefore(errorDiv, form.nextSibling);
+    }
+    </script>
     <!-- Testimonials Section -->
     <section id="testimonials" class="py-5 bg-light">
         <div class="container">

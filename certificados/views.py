@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, JsonResponse
 from django.views import View
-from .models import Certificado, ResultadoDisciplina, PedidoCorrecao, Notificacao, RegistroAuditoria, Aluno, Matricula
+from .models import Certificado, ResultadoDisciplina, PedidoCorrecao, Notificacao, RegistroAuditoria, Aluno, Matricula, DeclaracaoNotas
 from .forms import FormularioCertificado, FormularioPedidoCorrecao
 from django.template.loader import get_template
 from xhtml2pdf import pisa
@@ -54,8 +54,11 @@ def painel_aluno(request):
         # Obtém a matrícula ativa mais recente do aluno
         matricula = Matricula.objects.filter(aluno=aluno, ativo=True).order_by('-data_matricula').first()
         
-        # Obtém o certificado do aluno (assumindo 1 certificado por aluno)
+        # Obtém o certificado do aluno
         certificado = Certificado.objects.filter(matricula__aluno=aluno).first()
+        
+        # Obtém as declarações do aluno
+        declaracoes = DeclaracaoNotas.objects.filter(matricula__aluno=aluno).order_by('-data_emissao')
         
         # Obtém pedidos de correção do aluno
         pedidos_correcao = PedidoCorrecao.objects.filter(certificado__matricula__aluno=aluno).order_by('-data_solicitacao')
@@ -64,6 +67,7 @@ def painel_aluno(request):
             'aluno': aluno,
             'matricula': matricula,
             'certificado': certificado,
+            'declaracoes': declaracoes,
             'pedidos_correcao': pedidos_correcao,
         }
         
@@ -270,6 +274,121 @@ def verificar_certificado(request, identificador):
         'metodo_verificacao': metodo_verificacao,
         'valido': True
     })
+
+
+def visualizar_declaracao(request, declaracao_id):
+    # Verifica se o aluno está logado na sessão
+    if 'aluno_id' not in request.session:
+        messages.error(request, "Por favor, faça login para acessar esta página.")
+        return redirect('login_aluno')
+    
+    try:
+        aluno = Aluno.objects.get(id=request.session['aluno_id'])
+        declaracao = get_object_or_404(DeclaracaoNotas, id=declaracao_id)
+        
+        # Verifica se a declaração pertence ao aluno logado
+        if declaracao.matricula.aluno != aluno:
+            messages.error(request, "Você não tem permissão para acessar esta declaração.")
+            return redirect('painel_aluno')
+        
+        # Organiza os resultados
+        resultados = declaracao.resultados.all().select_related('disciplina')
+        
+        context = {
+            'declaracao': declaracao,
+            'aluno': aluno,
+            'resultados': resultados,
+        }
+        
+        return render(request, 'detalhes_declaracao.html', context)
+        
+    except Aluno.DoesNotExist:
+        messages.error(request, "Aluno não encontrado.")
+        return redirect('login_aluno')
+    except DeclaracaoNotas.DoesNotExist:
+        messages.error(request, "Declaração não encontrada.")
+        return redirect('painel_aluno')
+
+def descarregar_declaracao(request, declaracao_id):
+    # Verifica se o aluno está logado na sessão
+    if 'aluno_id' not in request.session:
+        messages.error(request, "Por favor, faça login para acessar esta página.")
+        return redirect('login_aluno')
+    
+    try:
+        aluno = Aluno.objects.get(id=request.session['aluno_id'])
+        declaracao = get_object_or_404(DeclaracaoNotas, id=declaracao_id)
+        
+        # Verifica se a declaração pertence ao aluno logado
+        if declaracao.matricula.aluno != aluno:
+            messages.error(request, "Você não tem permissão para baixar esta declaração.")
+            return redirect('painel_aluno')
+        
+        # Obtém os resultados
+        resultados = declaracao.resultados.all().select_related('disciplina')
+        
+        context = {
+            'declaracao': declaracao,
+            'aluno': aluno,
+            'resultados': resultados,
+        }
+        
+        # Renderiza o template para PDF
+        template = get_template('detalhes_declaracao.html')
+        html = template.render(context)
+        
+        # Cria o PDF
+        result = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+        
+        if not pdf.err:
+            response = HttpResponse(result.getvalue(), content_type='application/pdf')
+            filename = f"declaracao_{declaracao.numero_processo}.pdf"
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+        
+        return HttpResponse("Erro ao gerar PDF", status=500)
+        
+    except Aluno.DoesNotExist:
+        messages.error(request, "Aluno não encontrado.")
+        return redirect('login_aluno')
+    except DeclaracaoNotas.DoesNotExist:
+        messages.error(request, "Declaração não encontrada.")
+        return redirect('painel_aluno')
+
+def verificar_declaracao(request, identificador):
+    """
+    Verifica declaração por número de processo ou código de verificação
+    """
+    try:
+        # Tenta primeiro como número de processo (mais comum)
+        declaracao = get_object_or_404(
+            DeclaracaoNotas, 
+            numero_processo=identificador.upper(),
+        )
+        metodo_verificacao = 'número de processo'
+            
+    except Http404:
+        # Se falhar, tenta como código de verificação (UUID)
+        try:
+            declaracao = get_object_or_404(
+                DeclaracaoNotas, 
+                codigo_verificacao=identificador,
+            )
+            metodo_verificacao = 'código de verificação'
+        except (Http404, ValidationError):
+            # Se ambos falharem, mostra página de erro
+            return render(request, 'verificacao_declaracao.html', {
+                'invalido': True,
+                'identificador': identificador
+            })
+    
+    return render(request, 'verificacao_declaracao.html', {
+        'declaracao': declaracao,
+        'metodo_verificacao': metodo_verificacao,
+        'valido': True
+    })
+    
     
 def Erro(request, exception):
     return render(request, 'error.html', status=404)

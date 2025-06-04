@@ -1,0 +1,783 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de Declaração de Notas - IPIZ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="{% static 'img/ipiz.png' %}" type="image/x-icon">
+    <style>
+        :root {
+            --primary-color: #0d47a1;
+            --secondary-color: #2196f3;
+            --accent-color: #ff9800;
+            --success-color: #4caf50;
+            --danger-color: #f44336;
+            --light-blue: #e3f2fd;
+        }
+        
+        body {
+            background-color: #f5f9ff;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: float 15s infinite linear;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary-color);
+            top: 10%;
+            left: 5%;
+            animation-duration: 20s;
+        }
+        
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            background: var(--accent-color);
+            top: 60%;
+            left: 80%;
+            animation-duration: 25s;
+            animation-delay: 5s;
+        }
+        
+        .shape-3 {
+            width: 150px;
+            height: 150px;
+            background: var(--secondary-color);
+            top: 30%;
+            left: 70%;
+            animation-duration: 15s;
+            animation-delay: 2s;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, 50px) rotate(5deg); }
+            50% { transform: translate(100px, 0) rotate(0deg); }
+            75% { transform: translate(50px, -50px) rotate(-5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        
+        .verification-card {
+            max-width: 900px;
+            margin: 40px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(13, 71, 161, 0.1);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(5px);
+            position: relative;
+            z-index: 2;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .verification-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(13, 71, 161, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('{% static "img/pattern.png" %}') center/cover;
+            opacity: 0.1;
+        }
+        
+        .holographic-logo {
+            height: 100px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+            transition: transform 0.5s ease;
+        }
+        
+        .holographic-logo:hover {
+            transform: rotateY(20deg);
+        }
+        
+        .status-badge {
+            font-size: 1.2rem;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        
+        .status-badge::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right, 
+                rgba(255,255,255,0) 0%, 
+                rgba(255,255,255,0.3) 50%, 
+                rgba(255,255,255,0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        .declaration-details {
+            background: white;
+            border-radius: 15px;
+            padding: 0;
+            margin: 30px 0;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        
+        .detail-item {
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .detail-item:hover {
+            background: var(--light-blue);
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-value {
+            color: #333;
+            flex-grow: 1;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .security-feature {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        
+        .security-feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        }
+        
+        .qr-container {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin: 20px 0;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .qr-container:hover {
+            transform: scale(1.05);
+        }
+        
+        .qr-container::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px dashed rgba(13, 71, 161, 0.1);
+            border-radius: 20px;
+            pointer-events: none;
+            animation: rotate 60s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .verification-code {
+            font-family: 'Courier New', monospace;
+            background: var(--light-blue);
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(13, 71, 161, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .verification-code:hover {
+            background: rgba(13, 71, 161, 0.1);
+            box-shadow: 0 5px 15px rgba(13, 71, 161, 0.1);
+        }
+        
+        .signature-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 40px;
+            position: relative;
+        }
+        
+        .digital-signature {
+            position: relative;
+            padding-right: 120px;
+        }
+        
+        .signature-stamp {
+            position: absolute;
+            right: 0;
+            top: -30px;
+            width: 150px;
+            opacity: 0.9;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
+        
+        .signature-stamp:hover {
+            transform: rotate(-5deg);
+        }
+        
+        .invalid-section {
+            background: linear-gradient(to right, #fff5f5, #ffebeb);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border-left: 5px solid var(--danger-color);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        
+        .invalid-section::before {
+            content: '⚠️';
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 3rem;
+            opacity: 0.1;
+        }
+        
+        .contact-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 20px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .contact-card:hover .contact-icon {
+            transform: rotate(15deg);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        .tech-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(13, 71, 161, 0.05);
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            margin: 8px;
+            color: var(--primary-color);
+            border: 1px solid rgba(13, 71, 161, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .tech-badge:hover {
+            background: rgba(13, 71, 161, 0.1);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 71, 161, 0.1);
+        }
+        
+        .tech-badge i {
+            color: var(--secondary-color);
+        }
+        
+        .verification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .verification-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        
+        .verification-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .verification-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .verification-item:hover .verification-icon {
+            transform: scale(1.2);
+        }
+        
+        .disciplines-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+        
+        .disciplines-table th {
+            background-color: var(--light-blue);
+            color: var(--primary-color);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .disciplines-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .disciplines-table tr:hover td {
+            background-color: rgba(13, 71, 161, 0.03);
+        }
+        
+        .discipline-passed {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+        
+        .discipline-failed {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .verification-card {
+                margin: 20px 15px;
+                border-radius: 15px;
+            }
+            
+            .detail-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px 20px;
+                gap: 5px;
+            }
+            
+            .detail-label {
+                min-width: auto;
+            }
+            
+            .contact-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .contact-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .verification-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .disciplines-table {
+                font-size: 0.8rem;
+            }
+            
+            .disciplines-table th, 
+            .disciplines-table td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Formas flutuantes de fundo -->
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    
+    <div class="container py-4">
+        <div class="verification-card animate__animated animate__fadeIn">
+            <div class="card-header">
+                <img src="{% static 'img/ipiz.png' %}" alt="IPIZ" class="holographic-logo">
+                <h1 class="h3 mb-2">Validação de Declaração de Notas</h1>
+                <p class="mb-0 opacity-90">Instituto Politécnico Industrial do Zango</p>
+            </div>
+            
+            <div class="card-body px-4 py-4">
+                {% if declaracao %}
+                <div class="text-center mb-4">
+                    <span class="status-badge bg-success animate__animated animate__bounceIn">
+                        <i class="fas fa-file-contract"></i> DECLARAÇÃO VÁLIDA
+                    </span>
+                </div>
+
+                <div class="declaration-details">
+                    <!-- Número da Declaração -->
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-hashtag"></i> Número do Processo:</span>
+                        <span class="detail-value">{{ declaracao.numero_processo }}</span>
+                    </div>
+                    
+                    <!-- Dados do Aluno -->
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-user-graduate"></i> Nome do Aluno:</span>
+                        <span class="detail-value">
+                            {{ declaracao.matricula.aluno.nome_completo }}
+                        </span>
+                    </div>
+                    
+                    <!-- Curso -->
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-book-open"></i> Curso:</span>
+                        <span class="detail-value">
+                            {{ declaracao.matricula.curso.nome }}
+                            <small class="text-muted">({{ declaracao.matricula.curso.area_formacao }})</small>
+                        </span>
+                    </div>
+                    
+                    <!-- Semestre -->
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-calendar-alt"></i> Ano Letivo:</span>
+                        <span class="detail-value">{{ declaracao.ano_letivo }}</span>
+                    </div>
+                    
+                    <!-- Data de Emissão -->
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-clock"></i> Data de Emissão:</span>
+                        <span class="detail-value">{{ declaracao.data_emissao|date:"d/m/Y" }}</span>
+                    </div>
+                    
+                    <!-- Estado -->
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-info-circle"></i> Turma:</span>
+                         <span class="detail-value">{{ declaracao.turma }}</span>
+                    </div>
+                </div>
+
+
+                <div class="security-feature">
+                    <h5 class="text-center mb-4"><i class="fas fa-qrcode"></i> Verificação Digital</h5>
+                    <div class="text-center">
+                        <div class="qr-container">
+                            {% if declaracao.qr_code %}
+                                <img src="{{ declaracao.qr_code.url }}" alt="Código de Verificação" width="200">
+                            {% else %}
+                                <div class="text-center p-3 text-muted">
+                                    <i class="fas fa-exclamation-circle"></i> QR Code não disponível
+                                </div>
+                            {% endif %}
+                        </div>
+                        <p class="text-muted mt-3">Este código QR contém a assinatura digital do documento</p>
+                        <div class="verification-code">
+                            <i class="fas fa-key"></i>
+                            <span id="verification-code">{{ declaracao.codigo_verificacao }}</span>
+                            <button class="btn btn-sm btn-link" onclick="copyToClipboard('verification-code')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                    <!-- Seção para declaração inválida -->
+                    <div class="text-center mb-4">
+                        <span class="status-badge bg-danger animate__animated animate__headShake">
+                            <i class="fas fa-exclamation-triangle"></i> DECLARAÇÃO INVÁLIDA
+                        </span>
+                    </div>
+
+                    <div class="invalid-section animate__animated animate__fadeIn">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="text-danger"><i class="fas fa-times-circle"></i> Declaração não encontrada ou inválida</h4>
+                                <p class="mb-3">O código de verificação fornecido não corresponde a nenhuma declaração válida em nossos registros. Isso pode ocorrer por vários motivos:</p>
+                                
+                                <ul class="list-group list-group-flush mb-4">
+                                    <li class="list-group-item bg-transparent"><i class="fas fa-angle-right text-danger me-2"></i> O código foi digitado incorretamente</li>
+                                    <li class="list-group-item bg-transparent"><i class="fas fa-angle-right text-danger me-2"></i> A declaração foi revogada ou cancelada</li>
+                                    <li class="list-group-item bg-transparent"><i class="fas fa-angle-right text-danger me-2"></i> Tentativa de verificação de documento fraudulento</li>
+                                    <li class="list-group-item bg-transparent"><i class="fas fa-angle-right text-danger me-2"></i> A declaração não foi emitida pelo IPIC</li>
+                                </ul>
+                                
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-lightbulb me-2"></i> <strong>Dica:</strong> Verifique se o código foi digitado corretamente ou entre em contato conosco para assistência.
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="p-4">
+                                    <i class="fas fa-unlink text-danger" style="font-size: 5rem; opacity: 0.7;"></i>
+                                    <div class="mt-3">
+                                        <div class="verification-code bg-light">
+                                            <i class="fas fa-barcode"></i>
+                                            <span id="invalid-code">{{ codigo_verificacao }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="verification-grid">
+                        <div class="verification-item">
+                            <div class="verification-icon text-danger">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h5>Verifique Novamente</h5>
+                            <p class="text-muted">Confira cuidadosamente o código digitado.</p>
+                        </div>
+                        
+                        <div class="verification-item">
+                            <div class="verification-icon text-danger">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <h5>Proteção contra Fraude</h5>
+                            <p class="text-muted">Nossos sistemas detectaram uma possível irregularidade.</p>
+                        </div>
+                        
+                        <div class="verification-item">
+                            <div class="verification-icon text-danger">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <h5>Suporte Técnico</h5>
+                            <p class="text-muted">Entre em contato com nossa equipe para assistência.</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-card animate__animated animate__fadeInUp">
+                        <div class="contact-icon">
+                            <i class="fas fa-life-ring"></i>
+                        </div>
+                        <div>
+                            <h5>Precisa de ajuda?</h5>
+                            <p class="mb-1">Entre em contato com o Departamento de Registros Acadêmicos</p>
+                            <p class="mb-1"><i class="fas fa-phone-alt me-2"></i> +244 936 327 119</p>
+                            <p class="mb-0"><i class="fas fa-envelope me-2"></i> registros@ipic.ed.ao</p>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="footer mt-5">
+                    <div class="mb-4">
+                        <span class="tech-badge"><i class="fas fa-shield-alt"></i> Segurança Digital</span>
+                        <span class="tech-badge"><i class="fas fa-qrcode"></i> Código QR</span>
+                        <span class="tech-badge"><i class="fas fa-key"></i> Criptografia</span>
+                        <span class="tech-badge"><i class="fas fa-file-signature"></i> Assinatura Digital</span>
+                    </div>
+                    <p class="mb-1">Verificação realizada em {% now "d/m/Y H:i" %} via Sistema IPIZ</p>
+                    <p class="mb-0"><small>© {% now "Y" %} Instituto Politécnico Industrial do Zango. Todos os direitos reservados.</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Efeito de digitação para códigos
+        function typeWriter(elementId, text, speed) {
+            let i = 0;
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            element.innerHTML = '';
+            
+            function typing() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(typing, speed);
+                }
+            }
+            
+            typing();
+        }
+        
+        // Copiar texto para clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const original = element.innerHTML;
+                element.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+                setTimeout(() => {
+                    element.innerHTML = original;
+                }, 2000);
+            });
+        }
+        
+        // Animação quando elementos entram na viewport
+        function setupScrollAnimations() {
+            const elements = document.querySelectorAll('.detail-item, .verification-item, .security-feature');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            elements.forEach(el => observer.observe(el));
+        }
+        
+        // Inicialização quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            setupScrollAnimations();
+            
+            // Aplicar efeito de digitação nos códigos
+            const codes = document.querySelectorAll('.detail-value, .verification-code');
+            codes.forEach(code => {
+                const originalText = code.innerText;
+                code.innerHTML = '';
+                
+                let i = 0;
+                const typingEffect = setInterval(() => {
+                    if (i < originalText.length) {
+                        code.innerHTML += originalText.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(typingEffect);
+                    }
+                }, 50);
+            });
+            
+            // Efeito hover nos badges
+            const badges = document.querySelectorAll('.tech-badge');
+            badges.forEach(badge => {
+                badge.addEventListener('mouseenter', () => {
+                    badge.style.transform = 'translateY(-3px)';
+                    badge.style.boxShadow = '0 8px 20px rgba(13, 71, 161, 0.15)';
+                });
+                
+                badge.addEventListener('mouseleave', () => {
+                    badge.style.transform = 'translateY(0)';
+                    badge.style.boxShadow = '0 5px 15px rgba(13, 71, 161, 0.1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
