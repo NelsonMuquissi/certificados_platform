@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dtua@0mme+%=selhk)_5hnom@7_kd$6^e_f#029#2dreq&7ufa'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['certificados-platform.onrender.com', 'localhost', '127.0.0.1']
 
@@ -46,16 +46,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     
+    'cloudinary_storage',
+    'django.contrib.staticfiles',
+    'cloudinary',
+    
     'certificados',
     'crispy_forms',
     'allauth',
     'allauth.account',
-    
-    'cloudinary_storage',
-    'cloudinary',
-    'django.contrib.staticfiles',
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -210,9 +209,13 @@ JAZZMIN_SETTINGS = {
 }
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dmvelsags',
-    'API_KEY': '741552914574848',
-    'API_SECRET': 'DGFkdroPg9hYFJrDnWx4nmL0T-I',
+    'CLOUD_NAME': 'dmvelsags',  
+    'API_KEY': '481999597665957',  
+    'API_SECRET': 'VcmFJw6su9yuxEtYcxiYT4aaUSQ',
+    'SECURE': True,
+    'MEDIA_TAG': 'media',
+    'STATIC_TAG': 'static',
+    'EXCLUDE_DELETE_ORPHANED_MEDIA': True
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+CLOUDINARY_URL = 'cloudinary://481999597665957:VcmFJw6su9yuxEtYcxiYT4aaUSQ@dmvelsags'
