@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     
     'certificados',
     'crispy_forms',
@@ -54,6 +53,7 @@ INSTALLED_APPS = [
     
     'cloudinary_storage',
     'cloudinary',
+    'django.contrib.staticfiles',
 ]
 
 
@@ -210,7 +210,7 @@ JAZZMIN_SETTINGS = {
 }
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'Root',
+    'CLOUD_NAME': 'dmvelsags',
     'API_KEY': '741552914574848',
     'API_SECRET': 'DGFkdroPg9hYFJrDnWx4nmL0T-I',
 }
