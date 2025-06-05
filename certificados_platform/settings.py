@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +51,9 @@ INSTALLED_APPS = [
     'crispy_forms',
     'allauth',
     'allauth.account',
+    
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 
@@ -88,6 +94,21 @@ WSGI_APPLICATION = 'certificados_platform.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'certificados_db_vnrn',
+        'USER': 'admin',
+        'PASSWORD': 'wWr2NmYXo4RNCCUHCnOqeVztxLtEQQk6',
+        'HOST': 'dpg-d10pki6mcj7s73buo700-a.oregon-postgres.render.com',
+        'PORT': '5432',
+    }
+}
+"""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -95,7 +116,7 @@ DATABASES = {
     }
 }
 """
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -187,3 +208,11 @@ JAZZMIN_SETTINGS = {
     ],
     "language_chooser": False,
 }
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'Root',
+    'API_KEY': '741552914574848',
+    'API_SECRET': 'DGFkdroPg9hYFJrDnWx4nmL0T-I',
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
