@@ -514,7 +514,7 @@ class Certificado(models.Model):
     ano_letivo = models.CharField(max_length=9, editable=False)
     
     diretor = models.ForeignKey('Usuario', on_delete=models.PROTECT, related_name='certificados_emitidos')
-    cargo_de_direção = models.CharField(max_length=100, default='Directora do Instituto Politécnico Industrial do Calumbo')
+    cargo_de_direção = models.CharField(max_length=100, default='Directora do Instituto Politécnico Industrial do Zango')
     
     media_curricular = models.DecimalField(
         max_digits=4, 
@@ -555,17 +555,17 @@ class Certificado(models.Model):
     def gerar_numero_certificado(self):
         ano_atual = timezone.now().year
         ultimo_certificado = Certificado.objects.filter(
-            numero_certificado__startswith=f'IPIC-{ano_atual}'
+            numero_certificado__startswith=f'IPIZ-{ano_atual}'
         ).order_by('-numero_certificado').first()
             
         if ultimo_certificado:
             try:
                 ultimo_numero = int(ultimo_certificado.numero_certificado.split('-')[-1])
-                self.numero_certificado = f"IPIC-{ano_atual}-{ultimo_numero + 1:04d}"
+                self.numero_certificado = f"IPIZ-{ano_atual}-{ultimo_numero + 1:04d}"
             except (IndexError, ValueError):
-                self.numero_certificado = f"IPIC-{ano_atual}-0001"
+                self.numero_certificado = f"IPIZ-{ano_atual}-0001"
         else:
-            self.numero_certificado = f"IPIC-{ano_atual}-0001"
+            self.numero_certificado = f"IPIZ-{ano_atual}-0001"
         
     def atualizar_medias(self):
         if hasattr(self, 'resultados_disciplinas'):
@@ -1011,14 +1011,12 @@ class Notificacao(models.Model):
 class DeclaracaoNotas(models.Model):
     matricula = models.ForeignKey(Matricula, on_delete=models.PROTECT, related_name='declaracoes')
     numero_processo = models.CharField(max_length=20)
-    ano_letivo = models.CharField(max_length=9, default="2024-2025")
+    ano_letivo = models.CharField(max_length=9)
     turma = models.CharField(max_length=20, default="TI12AD", unique=True)
     codigo_verificacao = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     qr_code = models.ImageField(upload_to='qrcodes_declaracoes/', blank=True)
     data_emissao = models.DateField(default=timezone.now)
     emitido_por = models.ForeignKey(Usuario, on_delete=models.PROTECT)
-    carimbo_oleo = models.BooleanField(default=True, 
-        help_text="Indica se a declaração foi autenticada com carimbo à óleo")
     
     data_criacao = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)

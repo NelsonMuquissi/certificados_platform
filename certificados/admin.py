@@ -8,6 +8,8 @@ from .models import (
     CursoDisciplina, Matricula, Certificado, ResultadoDisciplina,
     PedidoCorrecao, RegistroAuditoria, ConfiguracaoSistema,ResultadoDeclaracao, DeclaracaoNotas
 )
+from django.urls import reverse
+from django.utils.html import format_html
 
 # Formulários devem vir primeiro
 class ResultadoDisciplinaForm(forms.ModelForm):
@@ -202,7 +204,21 @@ class CertificadoAdmin(admin.ModelAdmin):
                 obj.classificacao_final = 0.00
             if not hasattr(obj, 'numero_processo') and hasattr(obj, 'matricula'):
                 obj.numero_processo = obj.matricula.numero_matricula
-            super().save_model(request, obj, form, change)       
+            super().save_model(request, obj, form, change)   
+    
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_certificate_button'] = True
+        extra_context['certificate_url'] = reverse('visualizar_certificado', args=[object_id])
+        return super().change_view(request, object_id, form_url, extra_context)
+    
+    # Template personalizado
+    change_form_template = 'admin/certificados_platform/certificado/change_form.html'
+    
+    class Media:
+        css = {
+            'all': ('admin/css/certificados.css',)
+        }
         
 class PedidoCorrecaoAdmin(admin.ModelAdmin):
     list_display = ('certificado', 'solicitado_por', 'data_solicitacao', 'estado')
@@ -280,8 +296,8 @@ class ResultadoDeclaracaoInline(admin.TabularInline):
         return formset
 
 class DeclaracaoNotasAdmin(admin.ModelAdmin):
-    list_display = ('numero_processo', 'matricula', 'ano_letivo', 'turma', 'data_emissao', 'carimbo_oleo')
-    list_filter = ('ano_letivo', 'turma', 'carimbo_oleo')
+    list_display = ('numero_processo', 'matricula', 'ano_letivo', 'turma', 'data_emissao')
+    list_filter = ('ano_letivo', 'turma')
     search_fields = ('numero_processo', 'matricula__aluno__nome_completo')
     
     readonly_fields = (
@@ -297,7 +313,7 @@ class DeclaracaoNotasAdmin(admin.ModelAdmin):
             'fields': ('matricula', 'numero_processo', 'ano_letivo', 'turma')
         }),
         ('Emissão', {
-            'fields': ('data_emissao', 'emitido_por', 'carimbo_oleo')
+            'fields': ('data_emissao', 'emitido_por')
         }),
         ('Verificação', {
             'fields': ('codigo_verificacao', 'qr_code_preview')

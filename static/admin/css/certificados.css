@@ -1,0 +1,20 @@
+/* Estilo para o botão Ver Certificado */
+.viewlink {
+    background: #417690;
+    color: white;
+    padding: 7px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.viewlink:hover {
+    background: #205067;
+    color: white;
+}
+
+.viewlink i {
+    font-size: 14px;
+}
