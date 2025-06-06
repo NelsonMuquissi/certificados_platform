@@ -204,7 +204,7 @@
                         <h2><i class="fas fa-edit"></i> Solicitar Correção</h2>
                     </div>
                     
-                    {% if certificado %}
+                    {% if certificado or declaracoes %}
                         <div class="correction-info">
                             <p>Caso encontre algum erro no seu certificado ou declarações, você pode solicitar uma correção:</p>
                             
@@ -217,6 +217,7 @@
                                                 <div class="correction-header">
                                                     <span class="correction-date">{{ pedido.data_solicitacao|date:"d/m/Y H:i" }}</span>
                                                     <span class="correction-status">{{ pedido.get_estado_display }}</span>
+                                                    <span class="correction-type">{{ pedido.get_tipo_documento_display }}</span>
                                                 </div>
                                                 <div class="correction-desc">
                                                     <p>{{ pedido.descricao }}</p>
@@ -236,20 +237,21 @@
                                 <h4>Novo Pedido de Correção</h4>
                                 <form method="post" action="{% url 'solicitar_correcao' %}">
                                     {% csrf_token %}
-                                    <input type="hidden" name="certificado_id" value="{{ certificado.id }}">
                                     <div class="form-group">
-                                        <label for="tipo_documento">Documento:</label>
+                                        <label for="tipo_documento">Tipo de Documento:</label>
                                         <select class="form-control" id="tipo_documento" name="tipo_documento" required>
-                                            <option value="CERTIFICADO">Certificado</option>
-                                            <option value="DECLARACAO">Declaração de Notas</option>
+                                            <option value="CERTIFICADO" {% if not declaracoes %}selected{% endif %}>Certificado</option>
+                                            <option value="DECLARACAO" {% if not certificado %}selected{% endif %}>Declaração de Notas</option>
                                         </select>
                                     </div>
                                     <div class="form-group mt-3">
                                         <label for="documento_id">Selecione o documento:</label>
                                         <select class="form-control" id="documento_id" name="documento_id" required>
-                                            <option value="{{ certificado.id }}">Certificado: {{ certificado.numero_certificado }}</option>
+                                            {% if certificado %}
+                                                <option value="{{ certificado.id }}" data-type="CERTIFICADO">Certificado: {{ certificado.numero_certificado }}</option>
+                                            {% endif %}
                                             {% for declaracao in declaracoes %}
-                                                <option value="{{ declaracao.id }}">Declaração: {{ declaracao.numero_processo }} ({{ declaracao.semestre }}º Semestre)</option>
+                                                <option value="{{ declaracao.id }}" data-type="DECLARACAO">Declaração: {{ declaracao.numero_processo }} ({{ declaracao.ano_letivo }})</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -478,28 +480,42 @@
         }
 
         // Atualizar seleção de documentos para correção
-        document.getElementById('tipo_documento').addEventListener('change', function() {
-            const tipo = this.value;
-            const select = document.getElementById('documento_id');
-            const options = select.options;
+        document.addEventListener('DOMContentLoaded', function() {
+            const tipoDocumento = document.getElementById('tipo_documento');
+            const documentoSelect = document.getElementById('documento_id');
             
-            // Mostrar apenas os documentos do tipo selecionado
-            for (let i = 0; i < options.length; i++) {
-                const option = options[i];
-                if (tipo === 'CERTIFICADO') {
-                    option.style.display = option.text.includes('Certificado') ? '' : 'none';
-                } else {
-                    option.style.display = option.text.includes('Declaração') ? '' : 'none';
+            function updateDocumentOptions() {
+                const tipo = tipoDocumento.value;
+                const options = documentoSelect.options;
+                
+                // Mostrar apenas os documentos do tipo selecionado
+                for (let i = 0; i < options.length; i++) {
+                    const option = options[i];
+                    const optionType = option.getAttribute('data-type');
+                    
+                    if (optionType === tipo) {
+                        option.style.display = '';
+                        option.disabled = false;
+                    } else {
+                        option.style.display = 'none';
+                        option.disabled = true;
+                    }
+                }
+                
+                // Selecionar o primeiro visível
+                for (let i = 0; i < options.length; i++) {
+                    if (!options[i].disabled) {
+                        documentoSelect.value = options[i].value;
+                        break;
+                    }
                 }
             }
             
-            // Selecionar o primeiro visível
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].style.display !== 'none') {
-                    select.value = options[i].value;
-                    break;
-                }
-            }
+            // Atualizar quando o tipo mudar
+            tipoDocumento.addEventListener('change', updateDocumentOptions);
+            
+            // Inicializar
+            updateDocumentOptions();
         });
     </script>
 </body>

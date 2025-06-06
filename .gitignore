@@ -29,5 +29,5 @@ Thumbs.db
 
 # Diretório de arquivos estáticos coletados
 /staticfiles/
-/media/
+#/media/
 

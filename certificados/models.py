@@ -15,6 +15,8 @@ from datetime import date
 from django.core.mail import send_mail
 from num2words import num2words
 from decimal import Decimal, ROUND_HALF_UP
+import re
+
 
 
 PROVINCIAS_ANGOLA = (
@@ -142,16 +144,28 @@ class Aluno(models.Model):
     def clean(self):
         super().clean()
         
-        # Validação do número de identificação
+        # Validação do número de identificação com regex
         if self.tipo_identificacao == 'BI':
-            if len(self.numero_identificacao) != 14:
+            # Padrão: 9 dígitos + 2 letras + 3 dígitos (ex: 123456789LA123)
+            bi_pattern = re.compile(r'^\d{9}[A-Za-z]{2}\d{3}$')
+            if not bi_pattern.match(self.numero_identificacao):
                 raise ValidationError(
-                    {'numero_identificacao': 'O Bilhete de Identidade deve ter exatamente 14 caracteres (ex: xxxxxxxxxLAxxx)'}
+                    {'numero_identificacao': 'Formato inválido de BI.'}
                 )
-        elif self.tipo_identificacao == 'PASSAPORTE':
-            if len(self.numero_identificacao) != 8:
+            
+            # Validação específica para BI angolano
+            letras = self.numero_identificacao[9:11].upper()
+            if letras not in ['LA', 'LO', 'BE', 'MO', 'NA', 'NO', 'HA', 'HO', 'ZA', 'ZO','BB', 'CC', 'CN', 'CS', 'CU', 'LU', 'LS', 'MA', 'UE']:
                 raise ValidationError(
-                    {'numero_identificacao': 'O Passaporte deve ter exatamente 8 caracteres (ex: Nxxxxxxx)'}
+                    {'numero_identificacao': 'Código de emissor inválido no BI.'}
+                )
+                
+        elif self.tipo_identificacao == 'PASSAPORTE':
+            # Padrão: Letra N seguida de 7 dígitos (ex: N1234567)
+            passaporte_pattern = re.compile(r'^N\d{7}$')
+            if not passaporte_pattern.match(self.numero_identificacao):
+                raise ValidationError(
+                    {'numero_identificacao': 'Formato inválido de Passaporte. Use o padrão'}
                 )
         
         # Validação de idade mínima (15 anos)
@@ -163,7 +177,6 @@ class Aluno(models.Model):
                 raise ValidationError(
                     {'data_nascimento': 'O aluno deve ter pelo menos 15 anos completos.'}
                 )
-            # Verifica se a data de nascimento não é no futuro
             if self.data_nascimento > hoje:
                 raise ValidationError(
                     {'data_nascimento': 'A data de nascimento não pode ser no futuro.'}
@@ -941,29 +954,6 @@ class ConfiguracaoSistema(models.Model):
     class Meta:
         verbose_name_plural = 'Configurações do Sistema'
 
-class PedidoCorrecao(models.Model):
-    ESTADOS = (
-        ('PENDENTE', 'Pendente'),
-        ('APROVADO', 'Aprovado'),
-        ('REJEITADO', 'Rejeitado'),
-    )
-    
-    certificado = models.ForeignKey(Certificado, on_delete=models.CASCADE, related_name='pedidos_correcao')
-    solicitado_por = models.ForeignKey(Aluno, on_delete=models.CASCADE)
-    data_solicitacao = models.DateTimeField(auto_now_add=True)
-    descricao = models.TextField()
-    estado = models.CharField(max_length=10, choices=ESTADOS, default='PENDENTE')
-    resolvido_por = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='pedidos_resolvidos')
-    data_resolucao = models.DateTimeField(null=True, blank=True)
-    notas_resolucao = models.TextField(blank=True)
-    
-    class Meta:
-        ordering = ['-data_solicitacao']
-        verbose_name = 'Pedido de Correção'
-        verbose_name_plural = 'Pedidos de Correção'
-    
-    def __str__(self):
-        return f"Pedido #{self.id} - {self.certificado}"
 
 class RegistroAuditoria(models.Model):
     ACCOES = (
@@ -1012,7 +1002,7 @@ class DeclaracaoNotas(models.Model):
     matricula = models.ForeignKey(Matricula, on_delete=models.PROTECT, related_name='declaracoes')
     numero_processo = models.CharField(max_length=20)
     ano_letivo = models.CharField(max_length=9)
-    turma = models.CharField(max_length=20, default="TI12AD", unique=True)
+    turma = models.CharField(max_length=20, default="TI12AD")
     codigo_verificacao = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     qr_code = models.ImageField(upload_to='qrcodes_declaracoes/', blank=True)
     data_emissao = models.DateField(default=timezone.now)
@@ -1206,6 +1196,10 @@ class DeclaracaoNotas(models.Model):
                 logger = logging.getLogger(__name__)
                 logger.error(f"Falha ao enviar email de declaração: {str(e)}", exc_info=True)
                 raise
+    def clean(self):
+        super().clean()
+        if hasattr(self, 'resultados') and self.resultados.count() > 12:
+            raise ValidationError("Uma declaração de notas não pode ter mais de 12 disciplinas.")
     
     def save(self, *args, **kwargs):
         is_new = self.pk is None
@@ -1259,3 +1253,36 @@ class ResultadoDeclaracao(models.Model):
             return f"({int(nota)})valores"
         except:
             return "(0)valores"
+        
+        
+class PedidoCorrecao(models.Model):
+    ESTADOS = (
+        ('PENDENTE', 'Pendente'),
+        ('APROVADO', 'Aprovado'),
+        ('REJEITADO', 'Rejeitado'),
+    )
+    
+    TIPO_DOCUMENTO = (
+        ('CERTIFICADO', 'Certificado'),
+        ('DECLARACAO', 'Declaração de Notas'),
+    )
+    
+    tipo_documento = models.CharField(max_length=12, choices=TIPO_DOCUMENTO, default='CERTIFICADO')
+    certificado = models.ForeignKey(Certificado, on_delete=models.CASCADE, null=True, blank=True, related_name='pedidos_correcao')
+    declaracao = models.ForeignKey(DeclaracaoNotas, on_delete=models.CASCADE, null=True, blank=True, related_name='pedidos_correcao')
+    solicitado_por = models.ForeignKey(Aluno, on_delete=models.CASCADE)
+    data_solicitacao = models.DateTimeField(auto_now_add=True)
+    descricao = models.TextField()
+    estado = models.CharField(max_length=10, choices=ESTADOS, default='PENDENTE')
+    resolvido_por = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='pedidos_resolvidos')
+    data_resolucao = models.DateTimeField(null=True, blank=True)
+    notas_resolucao = models.TextField(blank=True)
+    
+    class Meta:
+        ordering = ['-data_solicitacao']
+        verbose_name = 'Pedido de Correção'
+        verbose_name_plural = 'Pedidos de Correção'
+    
+    def __str__(self):
+        doc = self.certificado or self.declaracao
+        return f"Pedido #{self.id} - {doc} ({self.get_tipo_documento_display()})"

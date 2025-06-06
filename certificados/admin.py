@@ -206,30 +206,29 @@ class CertificadoAdmin(admin.ModelAdmin):
                 obj.numero_processo = obj.matricula.numero_matricula
             super().save_model(request, obj, form, change)   
     
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        extra_context = extra_context or {}
-        extra_context['show_certificate_button'] = True
-        extra_context['certificate_url'] = reverse('visualizar_certificado', args=[object_id])
-        return super().change_view(request, object_id, form_url, extra_context)
-    
-    # Template personalizado
-    change_form_template = 'admin/certificados_platform/certificado/change_form.html'
     
     class Media:
         css = {
             'all': ('admin/css/certificados.css',)
         }
         
+
 class PedidoCorrecaoAdmin(admin.ModelAdmin):
-    list_display = ('certificado', 'solicitado_por', 'data_solicitacao', 'estado')
-    list_filter = ('estado', 'data_solicitacao')
-    search_fields = ('certificado__numero_certificado', 'solicitado_por__username')
+    list_display = ('tipo_documento', 'get_documento', 'solicitado_por', 'data_solicitacao', 'estado')
+    list_filter = ('estado', 'tipo_documento', 'data_solicitacao')
+    search_fields = ('certificado__numero_certificado', 'declaracao__numero_processo', 'solicitado_por__nome_completo')
     readonly_fields = ('data_solicitacao',)
-    autocomplete_fields = ['certificado', 'solicitado_por', 'resolvido_por']
+    autocomplete_fields = ['certificado', 'declaracao', 'solicitado_por', 'resolvido_por']
+    
+    def get_documento(self, obj):
+        if obj.tipo_documento == 'CERTIFICADO':
+            return obj.certificado.numero_certificado
+        return obj.declaracao.numero_processo
+    get_documento.short_description = 'Documento'
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.select_related('certificado', 'solicitado_por', 'resolvido_por')
+        return qs.select_related('certificado', 'declaracao', 'solicitado_por', 'resolvido_por')
     
     def has_change_permission(self, request, obj=None):
         return request.user.papel in ['ADMIN', 'SECRETARIA']
@@ -261,47 +260,37 @@ class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
 
 class ResultadoDeclaracaoInline(admin.TabularInline):
     model = ResultadoDeclaracao
-    extra = 0
-    autocomplete_fields = ['disciplina']
-    
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.select_related('disciplina')
+    form = forms.ModelForm  # Formulário básico (sem autopreenchimento)
+    extra = 1  # Mostra apenas 1 linha vazia
+    max_num = 12  # Limite de 12 disciplinas
+    autocomplete_fields = ['disciplina']  # Permite busca fácil de disciplinas
     
     def get_formset(self, request, obj=None, **kwargs):
         formset = super().get_formset(request, obj, **kwargs)
         
-        # Se estiver criando uma nova declaração ou editando uma existente
-        if obj is not None:
-            # Verifica se já existem resultados para esta declaração
-            existing_disciplinas = obj.resultados.values_list(
-                'disciplina_id', flat=True
-            )
-            
-            # Obtém todas as disciplinas do curso que ainda não foram adicionadas
-            curso_disciplinas = CursoDisciplina.objects.filter(
-                curso=obj.matricula.curso
-            ).exclude(
-                disciplina_id__in=existing_disciplinas
-            ).select_related('disciplina')
-            
-            # Adiciona automaticamente as disciplinas faltantes
-            for curso_disciplina in curso_disciplinas:
-                ResultadoDeclaracao.objects.create(
-                    declaracao=obj,
-                    disciplina=curso_disciplina.disciplina,
-                    nota_numerica=0.00  # Valor padrão
-                )
+        # Remove o preenchimento automático (DIFERENTE do Certificado)
+        if obj:
+            # Filtra disciplinas já adicionadas para evitar duplicação
+            disciplinas_adicionadas = obj.resultados.values_list('disciplina_id', flat=True)
+            formset.form.base_fields['disciplina'].queryset = Disciplina.objects.exclude(
+                id__in=disciplinas_adicionadas
+            ).order_by('nome')
         
         return formset
-
+    
+    def has_add_permission(self, request, obj=None):
+        # Bloqueia adição se já tiver 12 disciplinas
+        if obj and obj.resultados.count() >= 12:
+            return False
+        return True
+    
 class DeclaracaoNotasAdmin(admin.ModelAdmin):
     list_display = ('numero_processo', 'matricula', 'ano_letivo', 'turma', 'data_emissao')
     list_filter = ('ano_letivo', 'turma')
     search_fields = ('numero_processo', 'matricula__aluno__nome_completo')
     
     readonly_fields = (
-        'numero_processo', 'ano_letivo', 'codigo_verificacao', 
+        'numero_processo', 'codigo_verificacao', 
         'qr_code_preview', 'data_criacao', 'atualizado_em'
     )
     

@@ -46,3 +46,4 @@ class ResultadoDisciplinaForm(forms.ModelForm):
                     ).order_by('nome')
             except Certificado.DoesNotExist:
                 pass
+            

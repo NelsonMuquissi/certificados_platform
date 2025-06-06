@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.utils.timezone import now
 from django.contrib.auth.hashers import check_password
 from io import BytesIO
-
+from django.db.models import Q
 
 def home(request):
     return render(request, 'index.html')
@@ -60,8 +60,12 @@ def painel_aluno(request):
         # Obtém as declarações do aluno
         declaracoes = DeclaracaoNotas.objects.filter(matricula__aluno=aluno).order_by('-data_emissao')
         
-        # Obtém pedidos de correção do aluno
-        pedidos_correcao = PedidoCorrecao.objects.filter(certificado__matricula__aluno=aluno).order_by('-data_solicitacao')
+        # Obtém TODOS os pedidos de correção do aluno (certificados e declarações)
+        pedidos_correcao = PedidoCorrecao.objects.filter(
+            Q(certificado__matricula__aluno=aluno) | 
+            Q(declaracao__matricula__aluno=aluno),
+            solicitado_por=aluno  # Garante que foi o aluno quem solicitou
+        ).order_by('-data_solicitacao')
         
         context = {
             'aluno': aluno,
@@ -78,38 +82,48 @@ def painel_aluno(request):
         return redirect('login')
 
 def solicitar_correcao(request):
-    # Verifica se o aluno está logado
     if 'aluno_id' not in request.session:
         messages.error(request, "Por favor, faça login para acessar esta página.")
         return redirect('login_aluno')
     
     if request.method == 'POST':
-        certificado_id = request.POST.get('certificado_id')
+        tipo_documento = request.POST.get('tipo_documento')
+        documento_id = request.POST.get('documento_id')
         descricao = request.POST.get('descricao')
         
         try:
-            # Obtém o aluno da sessão
             aluno = Aluno.objects.get(id=request.session['aluno_id'])
             
-            # Verifica se o certificado pertence ao aluno
-            certificado = Certificado.objects.get(
-                id=certificado_id, 
-                matricula__aluno=aluno
-            )
-            
-            # Cria o pedido de correção (agora usando o Aluno diretamente)
-            PedidoCorrecao.objects.create(
-                certificado=certificado,
-                descricao=descricao,
-                estado='PENDENTE',
-                solicitado_por=aluno  # Agora aceita o Aluno diretamente
-            )
+            if tipo_documento == 'CERTIFICADO':
+                documento = Certificado.objects.get(
+                    id=documento_id, 
+                    matricula__aluno=aluno
+                )
+                PedidoCorrecao.objects.create(
+                    tipo_documento='CERTIFICADO',
+                    certificado=documento,
+                    descricao=descricao,
+                    estado='PENDENTE',
+                    solicitado_por=aluno
+                )
+            else:
+                documento = DeclaracaoNotas.objects.get(
+                    id=documento_id,
+                    matricula__aluno=aluno
+                )
+                PedidoCorrecao.objects.create(
+                    tipo_documento='DECLARACAO',
+                    declaracao=documento,
+                    descricao=descricao,
+                    estado='PENDENTE',
+                    solicitado_por=aluno
+                )
             
             messages.success(request, "Solicitação de correção enviada com sucesso!")
             return redirect('painel_aluno')
             
-        except Certificado.DoesNotExist:
-            messages.error(request, "Certificado não encontrado ou não pertence a você.")
+        except (Certificado.DoesNotExist, DeclaracaoNotas.DoesNotExist):
+            messages.error(request, "Documento não encontrado ou não pertence a você.")
         except Aluno.DoesNotExist:
             messages.error(request, "Aluno não encontrado.")
             return redirect('login_aluno')

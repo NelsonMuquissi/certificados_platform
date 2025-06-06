@@ -4,203 +4,430 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Declaração de Notas - IPIC</title>
+    <title>Declaração de Notas - IPIZ</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" href="{% static 'img/ipiz.png' %}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
         body {
-            background-color: #f8f9fa;
-            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
         }
-        
+
         .declaration-container {
-            max-width: 800px;
-            margin: 30px auto;
-            background-color: white;
-            padding: 40px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 8mm 15mm 5mm 15mm;
+            background-color: #fffef7;
+            border: 3px double #000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             position: relative;
-            border: 1px solid #ddd;
+            overflow: hidden;
+            background-image: linear-gradient(to right, #e6d9a2 0%, #fffef7 10%, #fffef7 90%, #e6d9a2 100%);
+            page-break-inside: avoid;
         }
-        
-        .declaration-header {
+
+        .declaration-container::after {
+            content: '';
+            position: absolute;
+            top: 5mm;
+            left: 5mm;
+            right: 5mm;
+            bottom: 5mm;
+            border: 1px dashed #000;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        .header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 15px;
-        }
-        
-        .declaration-title {
-            font-size: 18px;
-            font-weight: bold;
             margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
         }
-        
-        .institution-name {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
+
+        .header img.logo {
+            width: 65px;
+            margin-bottom: 3px;
+        }
+
+        .header h3 {
+            margin: 2px 0;
+            font-weight: 500;
+            font-size: 15px;
             text-transform: uppercase;
+            color: #1a3c34;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
         }
-        
-        .declaration-body {
-            line-height: 1.6;
-            font-size: 14px;
+
+        .header h3:first-of-type {
+            font-weight: 700;
+            color: #b71c1c;
+            margin-top: 3px;
         }
-        
+
+        .declaration-title {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-left: 10px;
+            margin-bottom: 15px;
+        }
+
+        .declaration-title img {
+            width: 80px;
+        }
+
+        .title-text {
+            margin-left: 70px;
+            text-align: center;
+        }
+
+        .title-text h2 {
+            margin: 0;
+            font-size: 25px;
+            font-family: 'Times New Roman', serif;
+            font-weight: bold;
+            color: #D4AF37;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            text-align: justify;
+            line-height: 1.4;
+            font-size: 16px;
+            color: #333;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content p {
+            margin-bottom: 10px;
+        }
+
+        .content strong {
+            color: #1a3c34;
+            font-weight: 500;
+        }
+
         .student-name {
             font-weight: bold;
+            color: #b71c1c;
+            text-transform: uppercase;
             text-decoration: underline;
-            font-size: 15px;
         }
-        
-        .parents-info {
-            margin: 15px 0;
+
+        .disciplines-section {
+            margin: 11px 0;
         }
-        
-        .grades-table {
-            width: 100%;
-            margin: 20px 0;
-            border-collapse: collapse;
+
+        .discipline-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            font-size: 14px;
         }
-        
-        .grades-table td {
-            padding: 5px 10px;
-            border-bottom: 1px solid #eee;
+
+        .discipline-name {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
         }
-        
-        .grades-table td:first-child {
-            width: 60%;
+
+        .discipline-name:after {
+            content: "....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................";
+            display: inline-block;
+            vertical-align: bottom;
+            color: #333;
+            margin-left: 3px;
         }
-        
-        .grades-table td:last-child {
-            text-align: right;
-            width: 40%;
+
+        .discipline-grade {
+            flex-shrink: 0;
+            margin-left: 3px;
+            white-space: nowrap;
+            display: flex;
+            align-items: baseline;
         }
-        
-        .declaration-footer {
-            margin-top: 40px;
-            text-align: right;
-        }
-        
-        .signature-line {
-            border-top: 1px solid #000;
-            width: 300px;
-            margin: 40px auto 0;
-            padding-top: 5px;
+
+        .grade-number {
+            border-bottom: 1px solid #000;
+            min-width: 10px;
             text-align: center;
+            margin-right: 5px;
         }
-        
-        .official-stamp {
-            position: absolute;
-            right: 50px;
-            bottom: 50px;
-            opacity: 0.8;
-            width: 150px;
+
+        .results {
+            margin: 15px 0;
+            font-size: 13px;
         }
-        
-        .watermark {
-            position: absolute;
-            opacity: 0.1;
-            font-size: 120px;
-            transform: rotate(-45deg);
-            top: 30%;
-            left: 10%;
-            z-index: -1;
-            color: #aaa;
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
         }
-        
-        .action-buttons {
+
+        .result-label {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .result-label:after {
+            content: "....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................";
+            display: inline-block;
+            vertical-align: bottom;
+            color: #333;
+            margin-left: 3px;
+        }
+
+        .result-value {
+            flex-shrink: 0;
+            margin-left: 3px;
+            white-space: nowrap;
+            font-weight: bold;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .footer-text {
+            margin-top: 3px;
+            font-size: 11px;
+            text-align: justify;
+            padding: 3px;
+            border-radius: 2px;
+        }
+
+        .signature-container {
             margin-top: 20px;
             text-align: center;
+            position: relative;
+            z-index: 2;
+            page-break-inside: avoid;
         }
-        
+
+        .signature-line {
+            width: 250px;
+            margin: 0 auto;
+            border-top: 1px solid #000;
+            text-align: center;
+            padding-top: 5px;
+        }
+
+        .signature p {
+            margin: 2px 0;
+            font-size: 14px;
+        }
+
+        .signature p.title {
+            font-weight: 600;
+            color: #1a3c34;
+            margin-top: 10px;
+        }
+
+        .signature p.subtitle {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .signature-img {
+            height: 35px;
+            margin-bottom: 3px;
+        }
+
+        .date {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 18px auto 0;
+            padding: 7px;
+            border-radius: 2px;
+        }
+
+        .qr-code img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .qr-code p {
+            font-size: 8px;
+            margin: 2px 0 0 0;
+            color: #555;
+        }
+
+        .institutional-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .action-buttons .btn {
+            font-size: 14px;
+            padding: 8px 15px;
+            border-radius: 2px;
+        }
+
         @media print {
-            .action-buttons {
-                display: none;
-            }
-            
             body {
-                background-color: white;
+                background: none;
+                margin: 0;
+                padding: 0;
             }
             
             .declaration-container {
-                box-shadow: none;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 8mm 15mm 5mm 15mm;
                 border: none;
-                padding: 20px;
+                box-shadow: none;
+                background-image: none;
+                min-height: 297mm;
+            }
+            
+            .action-buttons {
+                display: none !important;
+            }
+            
+            @page {
+                margin: 0;
+                size: A4;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="declaration-container">
-            <div class="watermark">DECLARAÇÃO</div>
-            
-            <div class="declaration-header">
-                <div class="declaration-title">REPÚBLICA DE ANGOLA</div>
-                <div class="declaration-title">GOVERNO PROVINCIAL DO ICOLO E BENGO</div>
-                <div class="institution-name">INSTITUTO POLITÉCNICO INDUSTRIAL Nº6081 "17 DE DEZEMBRO"</div>
-            </div>
-            
-            <div class="declaration-body">
-                <p>Para os devidos efeitos, declara-se <span class="student-name">{{ declaracao.matricula.aluno.nome_completo }}</span></p>
-                
-                <div class="parents-info">
-                    <p>Filho(a) de {{ declaracao.matricula.aluno.nome_pai }} e de {{ declaracao.matricula.aluno.nome_mae }}, 
-                    Natural de {{ declaracao.matricula.aluno.naturalidade }}, 
-                    Província de {{ declaracao.matricula.aluno.get_provincia_nascimento_display }}, 
-                    nascido(a) aos {{ declaracao.matricula.aluno.data_nascimento|date:"d \d\e F \d\e Y" }} 
-                    Portador do BI nº{{ declaracao.matricula.aluno.numero_identificacao }} 
-                    Sector de Identificação de {{ declaracao.matricula.aluno.local_emissao_identificacao }} 
-                    em {{ declaracao.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}.</p>
-                </div>
-                
-                <p>Frequentou o ano lectivo {{ declaracao.ano_letivo }} a {{ declaracao.matricula.curso.get_nivel_display }} classe, 
-                o curso de {{ declaracao.matricula.curso.nome }} na turma: {{ declaracao.matricula.turma }}, 
-                processo nº{{ declaracao.numero_processo }}, tendo obtido a classificação 
-                <strong>{{ declaracao.get_resultado_final_display }}</strong> finais:</p>
-                
-                <table class="grades-table">
-                    {% for resultado in declaracao.resultados.all %}
-                    <tr>
-                        <td>{{ resultado.disciplina.nome }}</td>
-                        <td>({{ resultado.nota_final }}) valores</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                
-                <p>Por ser verdade e me ter sido solicitado, mandei passar a presente declaração 
-                que vai por mim assinada e autenticada com o carimbo à óleo em uso neste,</p>
-                
-                <p class="text-center"><strong>INSTITUTO POLITÉCNICO INDUSTRIAL "17 DE DEZEMBRO" EM ICOLO E BENGO</strong></p>
-                
-                <div class="declaration-footer">
-                    <p>Aos {{ declaracao.data_emissao|date:"d \d\e F \d\e Y" }}.</p>
-                    
-                    <div class="signature-line">
-                        <p>O Diretor Acadêmico</p>
-                    </div>
-                </div>
-                
-                <img src="{% static 'img/selo.png' %}" alt="Selo Oficial" class="official-stamp">
-            </div>
-        </div>
-        
-        <div class="action-buttons">
-            <a href="{% url 'descarregar_declaracao' declaracao.id %}" class="btn btn-primary">
-                <i class="fas fa-download"></i> Baixar Declaração
-            </a>
-            <a href="{% url 'verificar_declaracao' declaracao.codigo_verificacao %}" class="btn btn-success">
-                <i class="fas fa-check-circle"></i> Verificar Autenticidade
-            </a>
-            <a href="{% url 'painel_aluno' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
+<div class="declaration-container">
+    <div class="header">
+        <img src="{% static 'img/insignia.png' %}" alt="ANGOLA" class="logo">
+        <h3 style="color: inherit;">REPÚBLICA DE ANGOLA</h3>
+        <h3>GOVERNO PROVINCIAL DO ICOLO E BENGO</h3>
+        <h3>INSTITUTO POLITÉCNICO INDUSTRIAL Nº6081 "17 DE DEZEMBRO"</h3>
+    </div>
+
+    <div class="declaration-title">
+        <img src="{% static 'img/ipiz.png' %}" alt="Instituto Logo">
+        <div class="title-text">
+            <h2>DECLARAÇÃO DE NOTAS</h2>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="content">
+        <p>
+            Para os devidos efeitos, declara-se <span class="student-name">{{ declaracao.matricula.aluno.nome_completo }}</span>
+     
+            Filho(a) de <strong>{{ declaracao.matricula.aluno.nome_pai }}</strong> e de <strong>{{ declaracao.matricula.aluno.nome_mae }}</strong>, 
+            Natural de <strong>{{ declaracao.matricula.aluno.naturalidade }}</strong>, Província de 
+            <strong>{{ declaracao.matricula.aluno.get_provincia_nascimento_display }}</strong>, nascido(a) aos 
+            <strong>{{ declaracao.matricula.aluno.data_nascimento|date:"d \d\e F \d\e Y" }}</strong>, portador(a) do 
+            <strong>BI nº{{ declaracao.matricula.aluno.numero_identificacao }}</strong>, Sector de Identificação de 
+            <strong>{{ declaracao.matricula.aluno.provincia }}</strong> em 
+            <strong>{{ declaracao.matricula.aluno.data_emissao_identificacao|date:"d/m/Y" }}</strong>.
+        </p>
+        
+        <p >
+            Frequentou o ano lectivo <strong>{{ declaracao.ano_letivo }}</strong> a <strong>{{ declaracao.matricula.curso.get_nivel_display }} classe</strong>, 
+            o curso de <strong>{{ declaracao.matricula.curso.nome }}</strong> na turma: <strong>{{ declaracao.turma }}</strong>, 
+            processo nº <strong> {{ declaracao.numero_processo }}</strong>, tendo obtido a classificação <strong>TRANSITA</strong> finais:
+        </p>
+        
+        <div style="margin-bottom: 20px;" class="disciplines-section">
+            {% for resultado in declaracao.resultados.all %}
+            <div class="discipline-row">
+                <span class="discipline-name">{{ resultado.disciplina.nome }}</span>
+                <span class="discipline-grade">
+                    {{ resultado.get_nota_formatada }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <p>
+            Por ser verdade e me ter sido solicitado, mandei passar a presente declaração que vai por mim assinada e autenticada com o carimbo à óleo em uso neste Instituto.
+        </p>
+
+        <div style="margin-top: 30px;" class="institutional-footer">
+            <p>INSTITUTO POLITÉCNICO INDUSTRIAL "17 DE DEZEMBRO" EM ICOLO E BENGO"</p>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 40px;" class="date">
+        <p>Aos {{ declaracao.data_emissao|date:"d \d\e F \d\e Y" }}.</p>
+    </div>
+
+    <div class="signature-container">
+        <div class="signature">
+            {% if declaracao.diretor.assinatura %}
+            <img src="{{ declaracao.diretor.assinatura.url }}" alt="Assinatura" class="signature-img">
+            {% endif %}
+            <div class="signature-line"></div>
+            <p class="title">{{ declaracao.diretor.get_full_name|default:"Joana Francisco da Rocha Francisco" }}</p>
+            <p class="subtitle">Directora do Instituto</p>
+        </div>
+
+        <div class="qr-code">
+            {% if declaracao.qr_code %}
+            <img src="{{ declaracao.qr_code.url }}" alt="QR Code de Verificação">
+            <p>Verificar autenticidade</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="action-buttons">
+    <button onclick="window.print()" class="btn btn-primary">
+        <i class="fas fa-file-pdf"></i> Baixar Declaração
+    </button>
+    <a href="{% url 'verificar_declaracao' declaracao.codigo_verificacao %}" class="btn btn-success">
+        <i class="fas fa-check-circle"></i> Verificar Autenticidade
+    </a>
+    <a href="{% url 'painel_aluno' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function adjustForPrint() {
+            const container = document.querySelector('.declaration-container');
+            if (container.scrollHeight > 297 * 3.78) {
+                document.body.style.fontSize = '13px';
+            }
+        }
+
+        window.addEventListener('beforeprint', function() {
+            adjustForPrint();
+        });
+    });
+</script>
 </body>
 </html>
